@@ -1,0 +1,288 @@
+[
+  {
+    "title": "AI基本概念理解",
+    "question": "以下哪项最准确地描述了机器学习的基本概念？",
+    "scenario": "小明刚接触人工智能，想了解机器学习是什么。",
+    "options": [
+      {
+        "id": "A",
+        "text": "机器学习是让计算机通过编程规则自动执行任务的技术"
+      },
+      {
+        "id": "B",
+        "text": "机器学习是让计算机从数据中学习模式并做出预测或决策的方法"
+      },
+      {
+        "id": "C",
+        "text": "机器学习是模拟人类大脑神经网络的唯一技术"
+      },
+      {
+        "id": "D",
+        "text": "机器学习是计算机通过预设的if-then规则进行推理的系统"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "机器学习核心是从数据中学习模式，而非仅依赖编程规则或预设规则。选项B准确描述了这一概念。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "知道人工智能的基本概念",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "机器学习",
+      "基本概念"
+    ],
+    "sourceReference": "AI素养框架-UACE, 艾博士深入浅出人工智能",
+    "status": "draft",
+    "id": "751e4017-6ddc-4e04-a651-796ac368cdf7",
+    "itemCode": "00007",
+    "createdAt": "2026-05-29T02:20:56.903Z",
+    "updatedAt": "2026-05-29T02:20:56.903Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "理解AI的基本概念",
+    "question": "以下哪一项最准确地描述了生成式AI的基本机制？",
+    "scenario": "小明在课堂上听到老师提到生成式AI，他想了解其工作原理。",
+    "options": [
+      {
+        "id": "A",
+        "text": "生成式AI通过预设规则直接生成内容，无需数据训练。"
+      },
+      {
+        "id": "B",
+        "text": "生成式AI基于大量数据训练，学习数据分布后生成新内容。"
+      },
+      {
+        "id": "C",
+        "text": "生成式AI只能复制已有数据，无法创造新内容。"
+      },
+      {
+        "id": "D",
+        "text": "生成式AI的生成结果总是准确无误的。"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "生成式AI通过机器学习从大量数据中学习模式，然后基于学到的分布生成新内容，因此B正确。A错误，因为生成式AI需要数据训练；C错误，因为生成式AI可以创造新内容；D错误，因为生成结果可能存在错误或幻觉。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "生成式AI",
+      "机器学习",
+      "基本概念"
+    ],
+    "sourceReference": "AI素养框架-UACE",
+    "status": "draft",
+    "id": "bf05c7c6-ccf1-496f-99e3-4f281d1655d8",
+    "itemCode": "00006",
+    "createdAt": "2026-05-28T02:47:36.586Z",
+    "updatedAt": "2026-05-28T02:47:36.586Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "id": "sample-001",
+    "title": "判断客服机器人的可靠回答",
+    "question": "面对 AI 客服给出的处理建议，最合适的下一步是什么？",
+    "scenario": "你在电商平台申请退款，AI 客服回复说“系统显示你不符合退款条件”，但没有说明具体原因。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接接受 AI 客服结论，不再追问"
+      },
+      {
+        "id": "B",
+        "text": "要求查看退款规则依据，并在必要时转人工核实"
+      },
+      {
+        "id": "C",
+        "text": "在社交平台发布订单号，让网友帮忙判断"
+      },
+      {
+        "id": "D",
+        "text": "反复提交同样问题直到 AI 改变回答"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "AI 客服可能遗漏上下文或解释不足。应要求依据、保留证据，并在权益相关场景中寻求人工复核。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "结果核验",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "客服",
+      "可靠性",
+      "消费者权益"
+    ],
+    "sourceReference": "自编场景题",
+    "status": "reviewed",
+    "createdAt": "2026-05-27T00:00:00.000Z",
+    "updatedAt": "2026-05-27T14:00:36.642Z",
+    "itemCode": "00001",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断"
+  },
+  {
+    "id": "sample-002",
+    "title": "识别生成式 AI 的隐私风险",
+    "question": "下列哪种做法最能降低隐私泄露风险？",
+    "scenario": "你想让生成式 AI 帮你润色一份包含客户姓名、手机号和合同金额的邮件。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接粘贴原文，因为 AI 会自动保密"
+      },
+      {
+        "id": "B",
+        "text": "删除或替换可识别个人和商业敏感信息后再提交"
+      },
+      {
+        "id": "C",
+        "text": "只把客户姓名改成昵称，手机号保留"
+      },
+      {
+        "id": "D",
+        "text": "把邮件截图上传，避免复制文本"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "使用 AI 工具前应最小化输入数据，移除个人身份信息和敏感商业信息，截图同样可能泄露内容。",
+    "dimension": "AI伦理（Ethics）",
+    "subSkill": "隐私保护",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "隐私",
+      "数据安全",
+      "办公"
+    ],
+    "sourceReference": "自编场景题",
+    "status": "draft",
+    "createdAt": "2026-05-27T00:00:00.000Z",
+    "updatedAt": "2026-05-27T12:54:42.143Z",
+    "itemCode": "00002",
+    "secondaryDimension": "关注使用AI过程中的数据隐私与信息安全问题"
+  },
+  {
+    "id": "sample-003",
+    "title": "改进提示词以获得可用输出",
+    "question": "为了让 AI 输出更符合需求，最有效的提示词改进是什么？",
+    "scenario": "你输入“帮我写一份 AI 培训方案”，结果 AI 给出的内容很泛泛，无法直接使用。",
+    "options": [
+      {
+        "id": "A",
+        "text": "只重复输入同一句话，多试几次"
+      },
+      {
+        "id": "B",
+        "text": "补充受众、培训目标、时长、输出格式和约束条件"
+      },
+      {
+        "id": "C",
+        "text": "要求 AI 一次性写得越长越好"
+      },
+      {
+        "id": "D",
+        "text": "把所有背景信息都省略，避免干扰 AI"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "清晰的任务背景、目标、约束和格式要求能显著提升生成结果的可用性。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "提示词设计",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "提示词",
+      "培训",
+      "生成式AI"
+    ],
+    "sourceReference": "自编场景题",
+    "status": "reviewed",
+    "createdAt": "2026-05-27T00:00:00.000Z",
+    "updatedAt": "2026-05-27T12:54:42.143Z",
+    "itemCode": "00003",
+    "secondaryDimension": "能通过调整提问或指令优化AI输出结果"
+  },
+  {
+    "id": "sample-004",
+    "title": "分析 AI 推荐中的偏差",
+    "question": "你最应该优先检查什么？",
+    "scenario": "某招聘系统推荐的候选人几乎都来自同一类学校，团队担心 AI 推荐存在偏差。",
+    "options": [
+      {
+        "id": "A",
+        "text": "只看推荐名单中候选人的平均分是否更高"
+      },
+      {
+        "id": "B",
+        "text": "检查训练数据、特征选择和不同群体的推荐通过率"
+      },
+      {
+        "id": "C",
+        "text": "关闭所有人工审核，避免人为偏见"
+      },
+      {
+        "id": "D",
+        "text": "只要模型准确率高，就不需要考虑偏差"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "算法偏差往往来自数据、特征和目标函数。需要比较不同群体的结果，并保留人工复核机制。",
+    "dimension": "AI伦理（Ethics）",
+    "subSkill": "公平性分析",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "偏差",
+      "招聘",
+      "公平性"
+    ],
+    "sourceReference": "自编场景题",
+    "status": "reviewed",
+    "createdAt": "2026-05-27T00:00:00.000Z",
+    "updatedAt": "2026-05-27T12:54:42.143Z",
+    "itemCode": "00004",
+    "secondaryDimension": "能识别AI可能带来的偏见或不公平现象"
+  },
+  {
+    "id": "sample-005",
+    "title": "判断 AI 生成内容的版权使用风险",
+    "question": "最稳妥的处理方式是什么？",
+    "scenario": "你用 AI 生成了一张宣传海报，准备直接用于商业广告，但不清楚生成素材是否模仿了特定艺术家的风格。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接商用，因为 AI 生成内容一定没有版权问题"
+      },
+      {
+        "id": "B",
+        "text": "记录生成过程，检查平台条款，并避免明确模仿在世艺术家或受保护作品"
+      },
+      {
+        "id": "C",
+        "text": "把图片压缩后使用，这样无法追溯来源"
+      },
+      {
+        "id": "D",
+        "text": "只要没有水印，就可以放心商用"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "商业使用 AI 生成内容时，应关注平台授权条款、训练或生成素材风险，以及是否近似受保护作品。",
+    "dimension": "AI伦理（Ethics）",
+    "subSkill": "版权与合规",
+    "cognitiveLevel": "evaluate",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "版权",
+      "合规",
+      "图像生成"
+    ],
+    "sourceReference": "自编场景题",
+    "status": "draft",
+    "createdAt": "2026-05-27T00:00:00.000Z",
+    "updatedAt": "2026-05-27T12:54:42.143Z",
+    "itemCode": "00005",
+    "secondaryDimension": "在使用AI时遵循学术规范与诚信原则"
+  }
+]

@@ -1,0 +1,1360 @@
+[
+  {
+    "title": "生成式AI的基本原理",
+    "question": "某公司引入了一款AI助手来自动生成营销文案。该助手通过分析大量历史优秀文案，学习语言模式和写作风格，从而生成新的文本内容。这种技术主要属于人工智能的哪个分支？",
+    "scenario": "市场部小李使用AI工具撰写产品推广软文，AI根据过往案例生成多版本文案供选择。",
+    "options": [
+      {
+        "id": "A",
+        "text": "机器学习"
+      },
+      {
+        "id": "B",
+        "text": "生成式AI"
+      },
+      {
+        "id": "C",
+        "text": "计算机视觉"
+      },
+      {
+        "id": "D",
+        "text": "专家系统"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "生成式AI（Generative AI）是指能够创建新内容（如文本、图像、音频等）的人工智能技术。题目中描述的AI通过分析历史数据学习模式并生成新文本，正是生成式AI的典型应用。机器学习是更广泛的概念，包含生成式AI，但此处特指生成内容的技术分支，故B更精准。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成",
+    "subSkill": "知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "cognitiveLevel": "remember",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "生成式AI",
+      "基本概念"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #8",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "目标一级维度：理解AI（Understand）\n目标二级维度：知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "id": "37e7b483-e06f-454b-9c8c-1f279f7c4fcf",
+    "createdAt": "2026-06-04T15:04:07.834Z",
+    "updatedAt": "2026-06-04T15:04:07.834Z"
+  },
+  {
+    "title": "机器学习与数据训练",
+    "question": "在训练一个用于识别猫狗图片的AI模型时，工程师向模型提供了数万张标注好的猫和狗的图片。模型通过调整内部参数来减少预测错误。这一过程体现了人工智能的什么基本机制？",
+    "scenario": "数据科学家正在训练一个图像分类模型，通过输入大量标注图片让模型“学习”特征。",
+    "options": [
+      {
+        "id": "A",
+        "text": "基于规则的程序设计"
+      },
+      {
+        "id": "B",
+        "text": "基于数据的训练"
+      },
+      {
+        "id": "C",
+        "text": "人工逻辑推理"
+      },
+      {
+        "id": "D",
+        "text": "随机猜测"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "人工智能（特别是机器学习）的核心机制是基于数据进行训练。模型通过处理大量数据（如标注图片），自动发现数据中的模式和规律，而不是依靠人类预先编写的所有具体规则。",
+    "dimension": "理解AI（Understand）",
+    "secondaryDimension": "理解AI基于数据进行训练和生成结果的基本机制",
+    "subSkill": "知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "机器学习",
+      "数据训练"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #8",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "目标一级维度：理解AI（Understand）\n目标二级维度：知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "id": "6547f559-b84d-430e-9990-b88f42ce9e55",
+    "createdAt": "2026-06-04T15:04:07.834Z",
+    "updatedAt": "2026-06-04T15:04:07.834Z"
+  },
+  {
+    "title": "区分AI擅长与不擅长的任务",
+    "question": "以下哪项任务是目前人工智能相对不擅长，而人类依然具有显著优势的？",
+    "scenario": "一家企业正在评估是否将某些业务外包给AI系统，需要判断哪些任务适合自动化。",
+    "options": [
+      {
+        "id": "A",
+        "text": "大规模数据计算与模式识别"
+      },
+      {
+        "id": "B",
+        "text": "快速检索海量信息"
+      },
+      {
+        "id": "C",
+        "text": "具有复杂情感共鸣和道德判断的心理咨询"
+      },
+      {
+        "id": "D",
+        "text": "生成标准化的财务报表"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "AI在数据处理、模式识别、信息检索和标准化生成方面表现优异。然而，涉及深层情感理解、复杂伦理道德判断以及真正共情的任务（如高级心理咨询），目前AI尚难以完全替代人类，因为这些任务需要深刻的人类社会经验和情感智能。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成",
+    "subSkill": "能区分AI擅长与不擅长处理的任务类型",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "AI能力边界",
+      "任务类型"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #8",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "目标一级维度：理解AI（Understand）\n目标二级维度：知道人工智能的基本概念（如机器学习、生成式AI等）",
+    "id": "b08455b0-ed5c-4abb-aed7-375303bb17dc",
+    "createdAt": "2026-06-04T15:04:07.834Z",
+    "updatedAt": "2026-06-04T15:04:07.834Z"
+  },
+  {
+    "title": "AI幻觉的识别与应对",
+    "question": "在使用生成式AI助手撰写历史报告时，AI提供了一段看似详实但包含虚构人物和事件的描述。作为用户，以下哪种处理方式最符合AI素养中的“理解AI”维度？",
+    "scenario": "李明正在使用一款流行的聊天机器人辅助完成大学历史课程作业。他输入了关于“19世纪末某特定城市工业发展”的查询。AI返回了一篇结构完整、引用丰富的文章，但李明在核对原始档案后发现，文章中提到的关键人物“张工程师”在历史上并不存在，且部分数据与官方统计不符。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接复制AI生成的内容，因为AI通常能提供准确的信息，节省查阅时间。"
+      },
+      {
+        "id": "B",
+        "text": "意识到AI输出具有不确定性，可能存在“幻觉”，需对关键事实进行交叉验证和人工核查。"
+      },
+      {
+        "id": "C",
+        "text": "立即停止使用该AI工具，认为其完全不可信，转而仅依靠记忆完成作业。"
+      },
+      {
+        "id": "D",
+        "text": "修改提示词，要求AI生成更多虚构内容以增加报告的创意性。"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "根据UACE框架中“理解AI”维度，用户需知道AI输出具有不确定性，可能出现错误或“幻觉”。因此，正确的做法是保持批判性思维，对AI生成的内容进行事实核查，而不是盲目信任或完全弃用。",
+    "dimension": "理解AI（Understand）",
+    "secondaryDimension": "理解AI基于数据进行训练和生成结果的基本机制",
+    "subSkill": "3. 知道AI输出具有不确定性，可能出现错误或“幻觉”",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "AI幻觉",
+      "事实核查",
+      "批判性思维"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "",
+    "id": "78eaa061-afe7-410c-82d9-f080fe5807bf",
+    "createdAt": "2026-06-04T14:00:37.461Z",
+    "updatedAt": "2026-06-04T14:00:37.461Z"
+  },
+  {
+    "title": "区分AI擅长与不擅长的任务",
+    "question": "某公司市场部希望利用AI提升工作效率。以下哪个任务最适合委托给当前主流的生成式AI工具处理？",
+    "scenario": "某初创公司的市场专员王芳接到任务，需要在一周内完成以下四项工作：1. 分析过去五年竞争对手的财务报表数据并预测未来股价；2. 撰写一篇关于新产品发布的博客文章初稿；3. 与关键客户进行面对面的谈判以达成合作协议；4. 整理公司内部的员工考勤记录并生成Excel表格。",
+    "options": [
+      {
+        "id": "A",
+        "text": "分析过去五年竞争对手的财务报表数据并预测未来股价"
+      },
+      {
+        "id": "B",
+        "text": "撰写一篇关于新产品发布的博客文章初稿"
+      },
+      {
+        "id": "C",
+        "text": "与关键客户进行面对面的谈判以达成合作协议"
+      },
+      {
+        "id": "D",
+        "text": "整理公司内部的员工考勤记录并生成Excel表格"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "根据UACE框架中“理解AI”维度，用户需能区分AI擅长与不擅长处理的任务类型。生成式AI擅长处理文本生成、创意构思等任务（如撰写博客初稿），但不擅长需要复杂逻辑推理、实时情感交互或精确数值预测的任务（如股价预测、面对面谈判）。虽然整理表格也可由AI辅助，但撰写初稿是生成式AI最典型且高价值的应用场景。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成",
+    "subSkill": "4. 能区分AI擅长与不擅长处理的任务类型",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "任务匹配",
+      "AI能力边界",
+      "应用场景"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "",
+    "id": "15973693-a643-415e-a56b-9301400b0ba6",
+    "createdAt": "2026-06-04T14:00:37.461Z",
+    "updatedAt": "2026-06-04T14:00:37.461Z"
+  },
+  {
+    "title": "AI偏见识别",
+    "question": "在使用AI招聘工具筛选简历时，发现该工具倾向于优先推荐男性候选人，即使女性候选人的资历相当。这主要反映了AI伦理中的哪个问题？",
+    "scenario": "某大型企业引入了一款基于AI的简历筛选系统，旨在提高招聘效率。HR部门在试运行期间发现，尽管公司明确规定禁止性别歧视，但AI系统在处理大量历史招聘数据时，自动降低了女性候选人简历的排名，尤其是针对技术类岗位。经调查，这是因为历史数据中男性技术人员比例较高，导致AI学习到了这种隐含的偏见。",
+    "options": [
+      {
+        "id": "A",
+        "text": "AI的数据隐私泄露问题"
+      },
+      {
+        "id": "B",
+        "text": "AI算法中的偏见或不公平现象"
+      },
+      {
+        "id": "C",
+        "text": "AI系统的计算资源不足"
+      },
+      {
+        "id": "D",
+        "text": "AI无法理解非结构化数据"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "根据UACE框架中“AI伦理”维度，用户需能识别AI可能带来的偏见或不公平现象。本案例中，AI因训练数据的历史偏差而产生了性别偏见，属于典型的算法公平性问题，是AI伦理中需要重点关注和解决的领域。",
+    "dimension": "AI伦理（Ethics）",
+    "secondaryDimension": "关注使用AI过程中的数据隐私与信息安全问题",
+    "subSkill": "2. 能识别AI可能带来的偏见或不公平现象",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "算法偏见",
+      "公平性",
+      "AI伦理"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "",
+    "id": "adbf7d8c-21ab-45b0-9983-97cd80846b70",
+    "createdAt": "2026-06-04T14:00:37.461Z",
+    "updatedAt": "2026-06-04T14:00:37.461Z"
+  },
+  {
+    "title": "MaaS API 调用中的幻觉识别",
+    "question": "在使用 MaaS（模型即服务）API 获取行业报告摘要时，发现模型生成的数据与官方公开数据存在细微差异，但行文流畅。作为 AI 素养使用者，最合理的处理方式是？",
+    "scenario": "某市场分析师正在使用大语言模型 API 快速整理竞品分析材料。模型生成了一段关于某公司去年营收的详细描述，逻辑通顺且引用了看似合理的来源，但分析师随后在官网核实发现具体数字有误。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接使用模型生成的内容，因为大模型通常非常准确，差异可能是官方数据更新滞后导致的。"
+      },
+      {
+        "id": "B",
+        "text": "忽略该部分，因为 AI 生成的文本只是辅助参考，不需要对准确性负责。"
+      },
+      {
+        "id": "C",
+        "text": "对 AI 生成的关键事实数据进行交叉验证，确认无误后再纳入报告，并标注信息来源。"
+      },
+      {
+        "id": "D",
+        "text": "立即停止使用该 MaaS API，认为该模型完全不可靠，无法用于任何专业工作。"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "根据 UACE 框架中 U.3（知道AI输出具有不确定性，可能出现错误或“幻觉”）和 A.4（能对AI生成结果的准确性和合理性进行判断），用户必须意识到 AI 可能产生“幻觉”，即生成看似合理但事实错误的内容。因此，关键数据必须经过人工交叉验证，不能盲目信任或完全弃用。",
+    "dimension": "理解AI（Understand）",
+    "secondaryDimension": "理解AI基于数据进行训练和生成结果的基本机制",
+    "subSkill": "3. 知道AI输出具有不确定性，可能出现错误或“幻觉”",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "MaaS API",
+      "幻觉",
+      "事实核查"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "???? MaaS API ????? 3 ??? UACE ??????????",
+    "id": "4d6e8df7-6d2a-49c7-b649-023b40911b6d",
+    "createdAt": "2026-06-04T13:58:06.292Z",
+    "updatedAt": "2026-06-04T13:58:06.292Z"
+  },
+  {
+    "title": "优化 MaaS API 提示词以获取结构化数据",
+    "question": "你希望利用 MaaS API 将一段非结构化的客户反馈文本转换为 JSON 格式，以便后续数据分析。初次调用时，模型返回了包含大量解释性文字的杂乱文本。以下哪种提示词优化策略最有效？",
+    "scenario": "一名数据工程师正在开发一个自动化流程，需要调用 MaaS API 处理用户评论。第一次尝试中，他输入：“请分析这段评论：‘这个产品很好用，但是物流太慢了。’”，模型返回了一段关于情感分析的长文。他需要的是标准的 JSON 格式，包含 'sentiment' 和 'logistics_issue' 字段。",
+    "options": [
+      {
+        "id": "A",
+        "text": "增加输入文本的长度，提供更多无关的背景信息，让模型有更多上下文。"
+      },
+      {
+        "id": "B",
+        "text": "明确要求输出格式，例如：“请以 JSON 格式输出，包含以下字段：sentiment (positive/negative), logistics_issue (true/false)。不要输出其他解释性文字。”"
+      },
+      {
+        "id": "C",
+        "text": "更换一个更昂贵的 API 服务，认为价格高的模型一定能理解格式要求。"
+      },
+      {
+        "id": "D",
+        "text": "手动修改模型返回的文本，将其强行转换为 JSON，而不修改提示词。"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "根据 UACE 框架中 A.3（能通过调整提问或指令优化AI输出结果），用户需要通过细化指令（如指定输出格式、约束输出内容）来引导模型生成符合需求的结果。明确指定 JSON 结构和字段是优化 MaaS API 调用的标准实践。",
+    "dimension": "创造AI（Create）",
+    "secondaryDimension": "能整合AI工具设计解决问题的流程或路径",
+    "subSkill": "3. 能通过调整提问或指令优化AI输出结果",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "MaaS API",
+      "提示词工程",
+      "结构化输出"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "???? MaaS API ????? 3 ??? UACE ??????????",
+    "id": "d1a3ad1a-b3e2-4944-b6a3-084c5eddc721",
+    "createdAt": "2026-06-04T13:58:06.292Z",
+    "updatedAt": "2026-06-04T13:58:06.292Z"
+  },
+  {
+    "title": "MaaS API 集成中的隐私风险评估",
+    "question": "某公司计划将内部敏感客户数据（包含姓名、身份证号）通过 MaaS API 发送给第三方 AI 服务商进行情感分析。从 AI 伦理和数据安全角度，以下哪项做法最符合规范？",
+    "scenario": "一家电商公司的技术团队正在评估是否使用外部 MaaS API 来自动标记客户投诉中的情绪倾向。数据中包含用户的真实姓名、电话号码和部分购买记录。法务部门对此表示担忧。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接发送数据，因为 MaaS API 通常比内部处理更高效，且用户已同意服务条款。"
+      },
+      {
+        "id": "B",
+        "text": "对数据进行匿名化处理（如移除姓名、身份证号等个人身份信息），并对剩余数据进行脱敏或加密后再发送，同时确认服务商的数据隐私政策。"
+      },
+      {
+        "id": "C",
+        "text": "只发送客户投诉的文本内容，但保留姓名以便后续人工核对，因为情感分析不需要身份信息。"
+      },
+      {
+        "id": "D",
+        "text": "禁止使用任何外部 AI 服务，因为所有数据都必须保留在本地服务器，无论数据是否敏感。"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "根据 UACE 框架中 E.1（关注使用AI过程中的数据隐私与信息安全问题），在使用外部 MaaS API 时，必须优先保护用户隐私。直接发送包含个人身份信息（PII）的数据违反隐私原则。正确的做法是数据脱敏/匿名化，并评估服务商的安全性。",
+    "dimension": "AI伦理（Ethics）",
+    "secondaryDimension": "关注使用AI过程中的数据隐私与信息安全问题",
+    "subSkill": "1. 关注使用AI过程中的数据隐私与信息安全问题",
+    "cognitiveLevel": "evaluate",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "MaaS API",
+      "数据隐私",
+      "伦理合规"
+    ],
+    "sourceReference": "#1 艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7"
+    ],
+    "generationRequirement": "???? MaaS API ????? 3 ??? UACE ??????????",
+    "id": "016013d0-56bb-4036-bb7c-a4aa4365da4b",
+    "createdAt": "2026-06-04T13:58:06.292Z",
+    "updatedAt": "2026-06-04T13:58:06.292Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 1",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "20b65c36-941f-4b74-8d02-e645f75a376f",
+    "createdAt": "2026-06-04T13:49:00.807Z",
+    "updatedAt": "2026-06-04T13:49:00.807Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #8 场景题 2",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #8”相关的问题。参考知识点：-- 444 of 483 -- -- 445 of 483 -- -- 446 of 483 -- -- 447 of 483 -- -- 448 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "bbdb5eb7-1957-4224-b598-3c13ac207428",
+    "createdAt": "2026-06-04T13:49:00.807Z",
+    "updatedAt": "2026-06-04T13:49:00.807Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 3",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "2493357e-8cd1-4fae-991c-78939f169862",
+    "createdAt": "2026-06-04T13:49:00.807Z",
+    "updatedAt": "2026-06-04T13:49:00.807Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 1",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "b58a93f5-3a57-4724-80ec-498cea618cad",
+    "createdAt": "2026-06-04T13:48:59.833Z",
+    "updatedAt": "2026-06-04T13:48:59.833Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #8 场景题 2",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #8”相关的问题。参考知识点：-- 444 of 483 -- -- 445 of 483 -- -- 446 of 483 -- -- 447 of 483 -- -- 448 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "77de751b-257a-45fb-9c93-d5b956073800",
+    "createdAt": "2026-06-04T13:48:59.833Z",
+    "updatedAt": "2026-06-04T13:48:59.833Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 3",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "d7b56b9e-dcaf-4294-b913-b2b6764d5341",
+    "createdAt": "2026-06-04T13:48:59.833Z",
+    "updatedAt": "2026-06-04T13:48:59.833Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 1",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "382a7f3b-fc30-4439-81ee-0f868b2438b5",
+    "createdAt": "2026-06-04T13:48:11.605Z",
+    "updatedAt": "2026-06-04T13:48:11.605Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #8 场景题 2",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #8”相关的问题。参考知识点：-- 444 of 483 -- -- 445 of 483 -- -- 446 of 483 -- -- 447 of 483 -- -- 448 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "aca5b45c-fbb8-4a62-9c00-ab9a154730d3",
+    "createdAt": "2026-06-04T13:48:11.605Z",
+    "updatedAt": "2026-06-04T13:48:11.605Z"
+  },
+  {
+    "title": "艾博士深入浅出人工智能 (马少平) .pdf #7 场景题 3",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“艾博士深入浅出人工智能 (马少平) .pdf #7”相关的问题。参考知识点：-- 404 of 483 -- -- 405 of 483 -- -- 406 of 483 -- -- 407 of 483 -- -- 408 of 48",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "secondaryDimension": "能对AI生成结果的准确性和合理性进行判断",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "pdf"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "b361ad9d-f4c1-443d-a85c-a44f4a861507",
+    "createdAt": "2026-06-04T13:48:11.605Z",
+    "updatedAt": "2026-06-04T13:48:11.605Z"
+  },
+  {
+    "title": "人工智能的定义理解",
+    "question": "以下哪项最准确地描述了人工智能（AI）的核心目标？",
+    "scenario": "在一场关于人工智能的科普讲座中，主讲人问听众：“人工智能究竟要做什么？”",
+    "options": [
+      {
+        "id": "A",
+        "text": "让机器像人一样思考"
+      },
+      {
+        "id": "B",
+        "text": "让机器拥有情感"
+      },
+      {
+        "id": "C",
+        "text": "让机器完全取代人类"
+      },
+      {
+        "id": "D",
+        "text": "让机器执行人类智能的任务"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "人工智能的核心目标是让机器能够执行通常需要人类智能的任务，如学习、推理、问题解决等。选项A过于狭窄，B和C不是AI的普遍目标。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "理解AI定义",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "人工智能",
+      "定义"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #7",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758"
+    ],
+    "generationRequirement": "",
+    "id": "4108d56a-ad9d-4d61-a325-741f9e396a97",
+    "createdAt": "2026-05-29T06:25:47.533Z",
+    "updatedAt": "2026-05-29T06:25:47.533Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "图灵测试的应用场景",
+    "question": "在测试一个聊天机器人是否具有智能时，以下哪种方法最符合图灵测试的思想？",
+    "scenario": "某公司开发了一款智能客服机器人，想通过一种经典方法评估其智能水平。",
+    "options": [
+      {
+        "id": "A",
+        "text": "让机器人回答一系列数学题"
+      },
+      {
+        "id": "B",
+        "text": "让人类评判者通过文本对话区分机器人和人类"
+      },
+      {
+        "id": "C",
+        "text": "测量机器人的反应速度"
+      },
+      {
+        "id": "D",
+        "text": "检查机器人是否具备情感"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "图灵测试由艾伦·图灵提出，核心是让人类评判者通过对话判断对方是机器还是人类，如果评判者无法区分，则认为机器具有智能。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "理解图灵测试",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "图灵测试",
+      "智能评估"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #7",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758"
+    ],
+    "generationRequirement": "",
+    "id": "6dd0153d-e56f-4b35-aee7-b2718d54876d",
+    "createdAt": "2026-05-29T06:25:47.533Z",
+    "updatedAt": "2026-05-29T06:25:47.533Z",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成"
+  },
+  {
+    "title": "机器学习的基本概念",
+    "question": "在机器学习中，模型通过什么方式来提高性能？",
+    "scenario": "小明正在学习机器学习，他问老师：“模型是如何变聪明的？”",
+    "options": [
+      {
+        "id": "A",
+        "text": "通过手工编写规则"
+      },
+      {
+        "id": "B",
+        "text": "通过从数据中学习模式"
+      },
+      {
+        "id": "C",
+        "text": "通过随机猜测"
+      },
+      {
+        "id": "D",
+        "text": "通过复制人类大脑"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "机器学习的关键是从数据中自动学习模式和规律，而不是依赖手工规则或随机猜测。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "理解机器学习",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "机器学习",
+      "学习方式"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #7",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "e0a7b104-be57-4712-804d-976c22591758"
+    ],
+    "generationRequirement": "",
+    "id": "184ef3e5-593b-40d9-86e6-73900dbcc71a",
+    "createdAt": "2026-05-29T06:25:47.533Z",
+    "updatedAt": "2026-05-29T06:25:47.533Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "AI应用判断",
+    "question": "以下哪个任务最适合使用生成式AI来完成？",
+    "scenario": "小华需要完成一项工作，他想知道是否可以用AI来提高效率。",
+    "options": [
+      {
+        "id": "A",
+        "text": "计算1+1等于多少"
+      },
+      {
+        "id": "B",
+        "text": "写一篇关于环保的短文"
+      },
+      {
+        "id": "C",
+        "text": "确定一个整数是否为质数"
+      },
+      {
+        "id": "D",
+        "text": "排序一组数字"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "生成式AI擅长创造性文本生成，如写文章。而精确计算和逻辑任务（如计算、质数判断、排序）更适合传统算法。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "能判断某一任务是否适合使用AI完成",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "任务判断",
+      "生成式AI"
+    ],
+    "sourceReference": "AI素养框架-UACE",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "d5708a71-794d-4a3d-b4f0-e8bc3cd8cf1a",
+    "createdAt": "2026-05-29T02:20:31.112Z",
+    "updatedAt": "2026-05-29T02:20:31.112Z",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成"
+  },
+  {
+    "title": "AI伦理意识",
+    "question": "在使用AI生成论文内容时，以下哪种行为违反了学术诚信原则？",
+    "scenario": "大学生小李使用AI辅助完成课程论文。",
+    "options": [
+      {
+        "id": "A",
+        "text": "使用AI生成大纲后自己撰写内容"
+      },
+      {
+        "id": "B",
+        "text": "将AI生成的整段文字直接复制到论文中而不加引用"
+      },
+      {
+        "id": "C",
+        "text": "用AI检查语法和拼写错误"
+      },
+      {
+        "id": "D",
+        "text": "向AI咨询相关文献的摘要"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "直接复制AI生成内容而不注明来源属于抄袭，违反学术诚信。其他选项属于合理辅助。",
+    "dimension": "AI伦理（Ethics）",
+    "subSkill": "在使用AI时遵循学术规范与诚信原则",
+    "cognitiveLevel": "evaluate",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "学术诚信",
+      "伦理"
+    ],
+    "sourceReference": "AI素养框架-UACE",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16",
+      "0b011a54-bf04-4f7e-8b39-7c83bf44dab8"
+    ],
+    "generationRequirement": "",
+    "id": "31073dfc-870c-42b7-8cf6-ec02c256ff7c",
+    "createdAt": "2026-05-29T02:20:31.112Z",
+    "updatedAt": "2026-05-29T02:20:31.112Z",
+    "secondaryDimension": "在使用AI时遵循学术规范与诚信原则"
+  },
+  {
+    "title": "图灵测试的基本概念",
+    "question": "在人工智能领域，图灵测试主要用于评估什么？",
+    "scenario": "小明在阅读《艾博士深入浅出人工智能》时，了解到图灵测试是衡量机器智能的一种方法。他好奇图灵测试的具体评估对象。",
+    "options": [
+      {
+        "id": "A",
+        "text": "机器的计算速度"
+      },
+      {
+        "id": "B",
+        "text": "机器的智能水平"
+      },
+      {
+        "id": "C",
+        "text": "机器的存储容量"
+      },
+      {
+        "id": "D",
+        "text": "机器的外观设计"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "图灵测试由艾伦·图灵提出，旨在测试机器是否能表现出与人类无法区分的智能行为，因此主要用于评估机器的智能水平。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "AI基础概念",
+    "cognitiveLevel": "remember",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "图灵测试",
+      "智能评估"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7",
+      "a7406cb9-d100-45f1-87af-764d200cb11b",
+      "09ae37dc-70e1-43cb-a683-5c7e73815e3b"
+    ],
+    "generationRequirement": "",
+    "id": "698d1980-6fdf-4900-ad61-5d902da19de4",
+    "createdAt": "2026-05-28T03:01:25.637Z",
+    "updatedAt": "2026-05-28T03:01:25.637Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "人工智能的定义",
+    "question": "根据《艾博士深入浅出人工智能》，人工智能的核心目标是？",
+    "scenario": "小华在课堂上听老师提到人工智能，他想知道人工智能的准确定义，于是查阅了相关资料。",
+    "options": [
+      {
+        "id": "A",
+        "text": "让机器拥有情感"
+      },
+      {
+        "id": "B",
+        "text": "让机器模拟人类智能"
+      },
+      {
+        "id": "C",
+        "text": "让机器取代人类"
+      },
+      {
+        "id": "D",
+        "text": "让机器拥有自我意识"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "人工智能旨在使机器能够执行通常需要人类智能的任务，如学习、推理、问题解决等，核心是模拟人类智能。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "AI基础概念",
+    "cognitiveLevel": "understand",
+    "difficultyEstimate": "easy",
+    "tags": [
+      "人工智能定义",
+      "模拟智能"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7",
+      "a7406cb9-d100-45f1-87af-764d200cb11b",
+      "09ae37dc-70e1-43cb-a683-5c7e73815e3b"
+    ],
+    "generationRequirement": "",
+    "id": "1801c817-ae40-4c13-b65e-b15096cd98e2",
+    "createdAt": "2026-05-28T03:01:25.637Z",
+    "updatedAt": "2026-05-28T03:01:25.637Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "人工智能的发展阶段",
+    "question": "在人工智能发展史上，符号主义学派主要依赖什么方法？",
+    "scenario": "小李在学习AI历史时，发现不同学派有不同的研究方法。他想了解符号主义学派的核心方法。",
+    "options": [
+      {
+        "id": "A",
+        "text": "神经网络"
+      },
+      {
+        "id": "B",
+        "text": "逻辑推理和符号操作"
+      },
+      {
+        "id": "C",
+        "text": "遗传算法"
+      },
+      {
+        "id": "D",
+        "text": "统计学习"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "符号主义学派认为智能可以通过符号操作和逻辑推理来实现，早期人工智能如专家系统就基于此方法。",
+    "dimension": "理解AI（Understand）",
+    "subSkill": "AI历史与学派",
+    "cognitiveLevel": "remember",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "符号主义",
+      "逻辑推理"
+    ],
+    "sourceReference": "艾博士深入浅出人工智能 (马少平) .pdf #1",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "68df7745-7da0-4f49-b84d-1efd99733eb7",
+      "a7406cb9-d100-45f1-87af-764d200cb11b",
+      "09ae37dc-70e1-43cb-a683-5c7e73815e3b"
+    ],
+    "generationRequirement": "",
+    "id": "661e243f-3718-42a3-8bc4-8e7252fc22c6",
+    "createdAt": "2026-05-28T03:01:25.637Z",
+    "updatedAt": "2026-05-28T03:01:25.637Z",
+    "secondaryDimension": "知道人工智能的基本概念（如机器学习、生成式AI等）"
+  },
+  {
+    "title": "应用AI进行有效交互",
+    "question": "在使用AI助手完成一份市场分析报告时，以下哪种做法最能优化AI的输出结果？",
+    "scenario": "小张需要撰写一份市场分析报告，他决定使用AI助手来帮助收集和整理信息。",
+    "options": [
+      {
+        "id": "A",
+        "text": "直接输入“帮我写一份市场分析报告”，然后接受AI的完整输出。"
+      },
+      {
+        "id": "B",
+        "text": "先提供报告的大纲和关键数据点，然后要求AI按照大纲填充内容。"
+      },
+      {
+        "id": "C",
+        "text": "多次随机提问，直到AI给出看起来不错的答案。"
+      },
+      {
+        "id": "D",
+        "text": "要求AI一次生成多个版本，然后选择最长的那个。"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "通过提供清晰的大纲和关键数据点，可以帮助AI理解任务的具体要求，从而生成更符合预期的内容。A过于笼统，C和D缺乏针对性，不能有效优化结果。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "能通过调整提问或指令优化AI输出结果",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "AI交互",
+      "指令优化",
+      "报告生成"
+    ],
+    "sourceReference": "AI素养框架-UACE",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16"
+    ],
+    "generationRequirement": "",
+    "id": "38b00458-33de-4440-8d2e-73672cc0b510",
+    "createdAt": "2026-05-28T01:44:01.332Z",
+    "updatedAt": "2026-05-28T01:44:01.332Z",
+    "secondaryDimension": "能清晰描述问题并与AI进行有效交互"
+  },
+  {
+    "title": "AI伦理中的偏见识别",
+    "question": "某公司使用AI系统筛选简历，发现系统对女性候选人的评分普遍低于男性。以下哪项行动最符合AI伦理原则？",
+    "scenario": "一家公司的人力资源部门使用AI工具自动筛选简历，但经过一段时间后，他们注意到该工具对女性申请者的评分较低。",
+    "options": [
+      {
+        "id": "A",
+        "text": "立即停止使用该AI系统，并完全依赖人工筛选。"
+      },
+      {
+        "id": "B",
+        "text": "忽略该现象，因为AI系统是客观的，不可能有偏见。"
+      },
+      {
+        "id": "C",
+        "text": "调查训练数据是否存在性别偏见，并对模型进行重新训练或调整。"
+      },
+      {
+        "id": "D",
+        "text": "将女性申请者的评分统一提高10%以平衡结果。"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "AI系统的偏见往往源于训练数据中的历史偏见。调查数据并重新训练是解决偏见问题的合理方法，符合伦理原则。A可能过于极端，B否认问题存在，D随意调整评分缺乏依据。",
+    "dimension": "AI伦理（Ethics）",
+    "subSkill": "能识别AI可能带来的偏见或不公平现象",
+    "cognitiveLevel": "evaluate",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "AI偏见",
+      "伦理",
+      "公平性"
+    ],
+    "sourceReference": "AI素养框架-UACE",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16"
+    ],
+    "generationRequirement": "",
+    "id": "5efa9be2-54f8-481f-8e83-d1c096cd02ba",
+    "createdAt": "2026-05-28T01:44:01.332Z",
+    "updatedAt": "2026-05-28T01:44:01.332Z",
+    "secondaryDimension": "能识别AI可能带来的偏见或不公平现象"
+  },
+  {
+    "title": "AI素养框架.docx #1 场景题 1",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“AI素养框架.docx #1”相关的问题。参考知识点：AI素养框架-UACE 1.理解AI（Understand） 定义：对AI基本原理、运行机制及能力边界的认知性理解 观测条目： （1）知道人工智能的基本概念（如",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "docx"
+    ],
+    "sourceReference": "AI素养框架.docx",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16"
+    ],
+    "generationRequirement": "",
+    "id": "a0011814-0cbe-4f15-84d4-75ed38954163",
+    "createdAt": "2026-05-28T01:17:55.530Z",
+    "updatedAt": "2026-05-28T01:17:55.530Z",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成"
+  },
+  {
+    "title": "AI素养框架.docx #1 场景题 2",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“AI素养框架.docx #1”相关的问题。参考知识点：AI素养框架-UACE 1.理解AI（Understand） 定义：对AI基本原理、运行机制及能力边界的认知性理解 观测条目： （1）知道人工智能的基本概念（如",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "analyze",
+    "difficultyEstimate": "hard",
+    "tags": [
+      "mock生成",
+      "docx"
+    ],
+    "sourceReference": "AI素养框架.docx",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16"
+    ],
+    "generationRequirement": "",
+    "id": "e1bd8d6a-3464-49bd-9cee-fadb75308cf8",
+    "createdAt": "2026-05-28T01:17:55.530Z",
+    "updatedAt": "2026-05-28T01:17:55.530Z",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成"
+  },
+  {
+    "title": "AI素养框架.docx #1 场景题 3",
+    "question": "在以下场景中，最符合“AI素养应用”要求的做法是什么？",
+    "scenario": "学习者正在处理与“AI素养框架.docx #1”相关的问题。参考知识点：AI素养框架-UACE 1.理解AI（Understand） 定义：对AI基本原理、运行机制及能力边界的认知性理解 观测条目： （1）知道人工智能的基本概念（如",
+    "options": [
+      {
+        "id": "A",
+        "text": "先核对信息来源和适用条件，再决定如何使用 AI 工具"
+      },
+      {
+        "id": "B",
+        "text": "直接相信 AI 输出，因为它通常比人工判断更稳定"
+      },
+      {
+        "id": "C",
+        "text": "只关注生成速度，不需要检查结果是否符合场景"
+      },
+      {
+        "id": "D",
+        "text": "把所有原始敏感信息完整输入 AI，以便得到更详细答案"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AI 素养强调结合场景、来源、约束和风险进行判断。应先核验信息和适用条件，再使用或采纳 AI 输出。",
+    "dimension": "应用AI（Apply）",
+    "subSkill": "场景化判断",
+    "cognitiveLevel": "apply",
+    "difficultyEstimate": "medium",
+    "tags": [
+      "mock生成",
+      "docx"
+    ],
+    "sourceReference": "AI素养框架.docx",
+    "status": "draft",
+    "sourceKnowledgeIds": [
+      "90609c2d-03b6-41ef-bd46-96ca58e45b16"
+    ],
+    "generationRequirement": "",
+    "id": "3a5f60f7-78da-4a2b-a2c3-44336e97a1cf",
+    "createdAt": "2026-05-28T01:17:55.530Z",
+    "updatedAt": "2026-05-28T01:17:55.530Z",
+    "secondaryDimension": "能判断某一任务是否适合使用AI完成"
+  }
+]
