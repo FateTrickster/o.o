@@ -7,13 +7,25 @@ from .config import ROOT_DIR, get_db_path, get_xfyun_model
 from .database import init_db
 from .framework import UACE_FRAMEWORK
 from .pipeline import generate_drafts as run_generate_drafts
-from .repositories import accept_draft, list_drafts, list_knowledge, list_questions, seed_framework
+from .repositories import (
+    accept_draft,
+    delete_draft,
+    delete_question,
+    get_draft,
+    get_question,
+    list_drafts,
+    list_knowledge,
+    list_questions,
+    seed_framework,
+    update_draft,
+)
 from .schemas import (
     GenerateDraftRequest,
     ImportJsonRequest,
     KnowledgeEntry,
     Question,
     QuestionDraft,
+    QuestionInput,
 )
 from .seed import initialize_from_json
 
@@ -62,12 +74,36 @@ def get_drafts():
     return list_drafts()
 
 
+@app.get("/drafts/{draft_id}", response_model=QuestionDraft)
+def get_one_draft(draft_id: str):
+    draft = get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+    return draft
+
+
 @app.post("/drafts/generate", response_model=List[QuestionDraft])
 async def generate_drafts(request: GenerateDraftRequest):
     try:
         return await run_generate_drafts(request)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.put("/drafts/{draft_id}", response_model=QuestionDraft)
+def update_generated_draft(draft_id: str, request: QuestionInput):
+    draft = update_draft(draft_id, request)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+    return draft
+
+
+@app.delete("/drafts/{draft_id}")
+def delete_generated_draft(draft_id: str):
+    deleted = delete_draft(draft_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Draft not found")
+    return {"ok": True}
 
 
 @app.post("/drafts/{draft_id}/accept", response_model=Question)
@@ -81,3 +117,19 @@ def accept_generated_draft(draft_id: str):
 @app.get("/questions", response_model=List[Question])
 def get_questions():
     return list_questions()
+
+
+@app.get("/questions/{question_id}", response_model=Question)
+def get_one_question(question_id: str):
+    question = get_question(question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return question
+
+
+@app.delete("/questions/{question_id}")
+def delete_formal_question(question_id: str):
+    deleted = delete_question(question_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return {"ok": True}

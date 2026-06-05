@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict, List, Optional
 import json
 import uuid
@@ -268,6 +269,107 @@ def create_drafts(
     return drafts
 
 
+def _insert_or_replace_draft(connection, draft: QuestionDraft) -> None:
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO question_drafts
+        (id, title, question, scenario, options_json, correct_answer,
+         explanation, dimension, secondary_dimension, sub_skill,
+         cognitive_level, difficulty_estimate, tags_json, source_reference,
+         status, source_knowledge_ids_json, generation_requirement,
+         generation_job_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            draft.id,
+            draft.title,
+            draft.question,
+            draft.scenario,
+            to_json([option.dict() for option in draft.options]),
+            draft.correctAnswer,
+            draft.explanation,
+            draft.dimension,
+            draft.secondaryDimension,
+            draft.subSkill,
+            draft.cognitiveLevel,
+            draft.difficultyEstimate,
+            to_json(draft.tags),
+            draft.sourceReference,
+            draft.status,
+            to_json(draft.sourceKnowledgeIds),
+            draft.generationRequirement,
+            draft.generationJobId,
+            draft.createdAt,
+            draft.updatedAt,
+        ),
+    )
+
+
+def _insert_or_replace_question(connection, question: Question) -> None:
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO questions
+        (id, item_code, title, question, scenario, options_json,
+         correct_answer, explanation, dimension, secondary_dimension,
+         sub_skill, cognitive_level, difficulty_estimate, tags_json,
+         source_reference, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            question.id,
+            question.itemCode,
+            question.title,
+            question.question,
+            question.scenario,
+            to_json([option.dict() for option in question.options]),
+            question.correctAnswer,
+            question.explanation,
+            question.dimension,
+            question.secondaryDimension,
+            question.subSkill,
+            question.cognitiveLevel,
+            question.difficultyEstimate,
+            to_json(question.tags),
+            question.sourceReference,
+            question.status,
+            question.createdAt,
+            question.updatedAt,
+        ),
+    )
+
+
+def update_draft(draft_id: str, input_data: QuestionInput) -> Optional[QuestionDraft]:
+    current = get_draft(draft_id)
+    if not current:
+        return None
+
+    selection = normalize_framework_selection(
+        input_data.dimension,
+        input_data.secondaryDimension,
+        f"{input_data.title} {input_data.question} {input_data.scenario} {input_data.subSkill} {' '.join(input_data.tags)}",
+    )
+    updated = QuestionDraft(
+        **input_data.dict(exclude={"dimension", "secondaryDimension"}),
+        dimension=selection["dimension"],
+        secondaryDimension=selection["secondaryDimension"],
+        id=draft_id,
+        sourceKnowledgeIds=current.sourceKnowledgeIds,
+        generationRequirement=current.generationRequirement,
+        generationJobId=current.generationJobId,
+        createdAt=current.createdAt,
+        updatedAt=now_iso(),
+    )
+    with connect() as connection:
+        _insert_or_replace_draft(connection, updated)
+    return updated
+
+
+def delete_draft(draft_id: str) -> bool:
+    with connect() as connection:
+        cursor = connection.execute("DELETE FROM question_drafts WHERE id = ?", (draft_id,))
+        return cursor.rowcount > 0
+
+
 def _next_item_code(connection) -> str:
     rows = connection.execute("SELECT item_code FROM questions").fetchall()
     max_code = 0
@@ -302,36 +404,7 @@ def accept_draft(draft_id: str) -> Optional[Question]:
             createdAt=now,
             updatedAt=now,
         )
-        connection.execute(
-            """
-            INSERT INTO questions
-            (id, item_code, title, question, scenario, options_json,
-             correct_answer, explanation, dimension, secondary_dimension,
-             sub_skill, cognitive_level, difficulty_estimate, tags_json,
-             source_reference, status, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                question.id,
-                question.itemCode,
-                question.title,
-                question.question,
-                question.scenario,
-                to_json([option.dict() for option in question.options]),
-                question.correctAnswer,
-                question.explanation,
-                question.dimension,
-                question.secondaryDimension,
-                question.subSkill,
-                question.cognitiveLevel,
-                question.difficultyEstimate,
-                to_json(question.tags),
-                question.sourceReference,
-                question.status,
-                question.createdAt,
-                question.updatedAt,
-            ),
-        )
+        _insert_or_replace_question(connection, question)
         connection.execute("DELETE FROM question_drafts WHERE id = ?", (draft_id,))
     return question
 
@@ -344,7 +417,73 @@ def list_questions() -> List[Question]:
         return [_row_to_question(dict(row)) for row in rows]
 
 
-def import_json_data(root_data_dir) -> Dict[str, int]:
+def get_question(question_id: str) -> Optional[Question]:
+    with connect() as connection:
+        row = connection.execute(
+            "SELECT * FROM questions WHERE id = ?", (question_id,)
+        ).fetchone()
+        return _row_to_question(dict(row)) if row else None
+
+
+def delete_question(question_id: str) -> bool:
+    with connect() as connection:
+        cursor = connection.execute("DELETE FROM questions WHERE id = ?", (question_id,))
+        return cursor.rowcount > 0
+
+
+def _question_input_from_raw(raw: Dict) -> QuestionInput:
+    tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    selection = normalize_framework_selection(
+        raw.get("dimension", ""),
+        raw.get("secondaryDimension", ""),
+        f"{raw.get('title', '')} {raw.get('question', '')} {raw.get('scenario', '')} {raw.get('subSkill', '')} {' '.join(tags)}",
+    )
+    return QuestionInput(
+        title=raw.get("title", ""),
+        question=raw.get("question", ""),
+        scenario=raw.get("scenario", ""),
+        options=raw.get("options") or [],
+        correctAnswer=raw.get("correctAnswer", ""),
+        explanation=raw.get("explanation", ""),
+        dimension=selection["dimension"],
+        secondaryDimension=selection["secondaryDimension"],
+        subSkill=raw.get("subSkill") or selection["secondaryDimension"],
+        cognitiveLevel=raw.get("cognitiveLevel", "apply"),
+        difficultyEstimate=raw.get("difficultyEstimate", "medium"),
+        tags=tags,
+        sourceReference=raw.get("sourceReference", ""),
+        status=raw.get("status", "draft"),
+    )
+
+
+def _draft_from_raw(raw: Dict) -> QuestionDraft:
+    input_data = _question_input_from_raw(raw)
+    now = now_iso()
+    return QuestionDraft(
+        **input_data.dict(),
+        id=raw.get("id") or str(uuid.uuid4()),
+        sourceKnowledgeIds=raw.get("sourceKnowledgeIds") or [],
+        generationRequirement=raw.get("generationRequirement", ""),
+        generationJobId=raw.get("generationJobId"),
+        createdAt=raw.get("createdAt") or now,
+        updatedAt=raw.get("updatedAt") or now,
+    )
+
+
+def _question_from_raw(raw: Dict, fallback_item_code: str) -> Question:
+    input_data = _question_input_from_raw(raw)
+    now = now_iso()
+    item_code = raw.get("itemCode") or fallback_item_code
+    return Question(
+        **input_data.dict(),
+        id=raw.get("id") or str(uuid.uuid4()),
+        itemCode=item_code,
+        createdAt=raw.get("createdAt") or now,
+        updatedAt=raw.get("updatedAt") or now,
+    )
+
+
+def import_json_data(root_data_dir: Path) -> Dict[str, int]:
     counts = {"knowledge": 0, "drafts": 0, "questions": 0}
 
     knowledge_file = root_data_dir / "knowledge.json"
@@ -364,6 +503,26 @@ def import_json_data(root_data_dir) -> Dict[str, int]:
             )
             counts["knowledge"] += 1
 
-    # Existing questions/drafts are intentionally not fully imported yet; the MVP
-    # backend focuses on new Python-generated drafts while keeping Next.js data intact.
+    with connect() as connection:
+        questions_file = root_data_dir / "questions.json"
+        if questions_file.exists():
+            used_codes = {
+                row["item_code"]
+                for row in connection.execute("SELECT item_code FROM questions").fetchall()
+            }
+            for raw in json.loads(questions_file.read_text(encoding="utf-8")):
+                fallback_code = _next_item_code(connection)
+                question = _question_from_raw(raw, fallback_code)
+                if question.itemCode in used_codes and not raw.get("itemCode"):
+                    question.itemCode = _next_item_code(connection)
+                used_codes.add(question.itemCode)
+                _insert_or_replace_question(connection, question)
+                counts["questions"] += 1
+
+        drafts_file = root_data_dir / "drafts.json"
+        if drafts_file.exists():
+            for raw in json.loads(drafts_file.read_text(encoding="utf-8")):
+                _insert_or_replace_draft(connection, _draft_from_raw(raw))
+                counts["drafts"] += 1
+
     return counts

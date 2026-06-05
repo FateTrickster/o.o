@@ -6,9 +6,11 @@ It does not replace the Next.js UI yet. It provides a standalone FastAPI service
 
 - initialize a local SQLite database
 - seed the UACE framework
-- import existing `data/knowledge.json`
+- import existing `data/knowledge.json`, `data/drafts.json`, and `data/questions.json`
 - call Xfyun MaaS to generate question drafts
 - store generated drafts in SQLite
+- list, edit, delete, and accept generated drafts
+- list, view, and delete formal questions
 - accept a draft into the formal question table with an auto-incrementing `itemCode`
 
 ## Install
@@ -61,6 +63,24 @@ POST /drafts/generate
   "targetTags": ["事实核查"],
   "count": 3
 }
+```
+
+## Core Endpoints
+
+```text
+GET    /health
+POST   /admin/init-db
+POST   /admin/import-json
+GET    /framework
+GET    /knowledge
+GET    /drafts
+GET    /drafts/{draft_id}
+PUT    /drafts/{draft_id}
+DELETE /drafts/{draft_id}
+POST   /drafts/{draft_id}/accept
+GET    /questions
+GET    /questions/{question_id}
+DELETE /questions/{question_id}
 ```
 
 ## Notes
