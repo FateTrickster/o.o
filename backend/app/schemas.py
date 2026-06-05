@@ -42,6 +42,14 @@ class KnowledgeEntry(BaseModel):
     updatedAt: str
 
 
+class KnowledgeInput(BaseModel):
+    title: str
+    content: str
+    sourceFileName: str = ""
+    sourceType: str = ""
+    tags: List[str] = Field(default_factory=list)
+
+
 class QuestionDraft(QuestionInput):
     id: str
     sourceKnowledgeIds: List[str] = Field(default_factory=list)

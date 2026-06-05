@@ -9,8 +9,9 @@ It does not replace the Next.js UI yet. It provides a standalone FastAPI service
 - import existing `data/knowledge.json`, `data/drafts.json`, and `data/questions.json`
 - call Xfyun MaaS to generate question drafts
 - store generated drafts in SQLite
+- list, view, create, edit, and delete knowledge entries
 - list, edit, delete, and accept generated drafts
-- list, view, and delete formal questions
+- list, view, edit, and delete formal questions
 - accept a draft into the formal question table with an auto-incrementing `itemCode`
 
 ## Install
@@ -73,6 +74,10 @@ POST   /admin/init-db
 POST   /admin/import-json
 GET    /framework
 GET    /knowledge
+POST   /knowledge
+GET    /knowledge/{entry_id}
+PUT    /knowledge/{entry_id}
+DELETE /knowledge/{entry_id}
 GET    /drafts
 GET    /drafts/{draft_id}
 PUT    /drafts/{draft_id}
@@ -80,6 +85,7 @@ DELETE /drafts/{draft_id}
 POST   /drafts/{draft_id}/accept
 GET    /questions
 GET    /questions/{question_id}
+PUT    /questions/{question_id}
 DELETE /questions/{question_id}
 ```
 

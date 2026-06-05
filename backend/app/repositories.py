@@ -8,6 +8,7 @@ from .framework import UACE_FRAMEWORK, normalize_framework_selection
 from .schemas import (
     GenerationJob,
     KnowledgeEntry,
+    KnowledgeInput,
     Question,
     QuestionDraft,
     QuestionInput,
@@ -112,25 +113,64 @@ def get_knowledge(entry_id: str) -> Optional[KnowledgeEntry]:
         return _row_to_knowledge(dict(row)) if row else None
 
 
+def _insert_or_replace_knowledge(connection, entry: KnowledgeEntry) -> None:
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO knowledge_entries
+        (id, title, content, source_file_name, source_type, tags_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            entry.id,
+            entry.title,
+            entry.content,
+            entry.sourceFileName,
+            entry.sourceType,
+            to_json(entry.tags),
+            entry.createdAt,
+            entry.updatedAt,
+        ),
+    )
+
+
 def upsert_knowledge(entry: KnowledgeEntry) -> None:
     with connect() as connection:
-        connection.execute(
-            """
-            INSERT OR REPLACE INTO knowledge_entries
-            (id, title, content, source_file_name, source_type, tags_json, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                entry.id,
-                entry.title,
-                entry.content,
-                entry.sourceFileName,
-                entry.sourceType,
-                to_json(entry.tags),
-                entry.createdAt,
-                entry.updatedAt,
-            ),
-        )
+        _insert_or_replace_knowledge(connection, entry)
+
+
+def create_knowledge(input_data: KnowledgeInput) -> KnowledgeEntry:
+    now = now_iso()
+    entry = KnowledgeEntry(
+        **input_data.dict(),
+        id=str(uuid.uuid4()),
+        createdAt=now,
+        updatedAt=now,
+    )
+    with connect() as connection:
+        _insert_or_replace_knowledge(connection, entry)
+    return entry
+
+
+def update_knowledge(entry_id: str, input_data: KnowledgeInput) -> Optional[KnowledgeEntry]:
+    current = get_knowledge(entry_id)
+    if not current:
+        return None
+
+    entry = KnowledgeEntry(
+        **input_data.dict(),
+        id=entry_id,
+        createdAt=current.createdAt,
+        updatedAt=now_iso(),
+    )
+    with connect() as connection:
+        _insert_or_replace_knowledge(connection, entry)
+    return entry
+
+
+def delete_knowledge(entry_id: str) -> bool:
+    with connect() as connection:
+        cursor = connection.execute("DELETE FROM knowledge_entries WHERE id = ?", (entry_id,))
+        return cursor.rowcount > 0
 
 
 def create_generation_job(
@@ -423,6 +463,30 @@ def get_question(question_id: str) -> Optional[Question]:
             "SELECT * FROM questions WHERE id = ?", (question_id,)
         ).fetchone()
         return _row_to_question(dict(row)) if row else None
+
+
+def update_question(question_id: str, input_data: QuestionInput) -> Optional[Question]:
+    current = get_question(question_id)
+    if not current:
+        return None
+
+    selection = normalize_framework_selection(
+        input_data.dimension,
+        input_data.secondaryDimension,
+        f"{input_data.title} {input_data.question} {input_data.scenario} {input_data.subSkill} {' '.join(input_data.tags)}",
+    )
+    updated = Question(
+        **input_data.dict(exclude={"dimension", "secondaryDimension"}),
+        dimension=selection["dimension"],
+        secondaryDimension=selection["secondaryDimension"],
+        id=question_id,
+        itemCode=current.itemCode,
+        createdAt=current.createdAt,
+        updatedAt=now_iso(),
+    )
+    with connect() as connection:
+        _insert_or_replace_question(connection, updated)
+    return updated
 
 
 def delete_question(question_id: str) -> bool:
