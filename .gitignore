@@ -4,3 +4,6 @@
 node_modules
 .next
 *.log
+__pycache__/
+*.pyc
+backend/data/
