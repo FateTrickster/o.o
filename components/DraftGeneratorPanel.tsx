@@ -331,7 +331,7 @@ export default function DraftGeneratorPanel() {
       <section className="section-heading">
         <div>
           <h2>出题草稿</h2>
-          <p>基于知识条目生成 mock 题目草稿，人工确认后进入正式题库。</p>
+          <p>基于知识条目生成题目草稿，人工确认后进入正式题库。</p>
         </div>
       </section>
 

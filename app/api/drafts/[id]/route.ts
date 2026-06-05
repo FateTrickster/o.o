@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { deleteDraft, getDraft, updateDraft } from "@/lib/drafts";
-import { QuestionDraftInput } from "@/types/draft";
+import { NextRequest } from "next/server";
+import { proxyJson, proxyJsonNoRequest } from "@/lib/backendApi";
 
 export const runtime = "nodejs";
 
@@ -12,38 +11,15 @@ type Params = {
 
 export async function GET(_request: NextRequest, { params }: Params) {
   const { id } = await params;
-  const draft = await getDraft(id);
-  if (!draft) {
-    return NextResponse.json({ error: "Draft not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(draft);
+  return proxyJsonNoRequest(`/drafts/${encodeURIComponent(id)}`, "Draft not found");
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
-  try {
-    const { id } = await params;
-    const input = (await request.json()) as QuestionDraftInput;
-    const draft = await updateDraft(id, input);
-    if (!draft) {
-      return NextResponse.json({ error: "Draft not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(draft);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update draft" },
-      { status: 400 }
-    );
-  }
+  const { id } = await params;
+  return proxyJson(request, `/drafts/${encodeURIComponent(id)}`, "Failed to update draft", "PUT");
 }
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = await params;
-  const removed = await deleteDraft(id);
-  if (!removed) {
-    return NextResponse.json({ error: "Draft not found" }, { status: 404 });
-  }
-
-  return NextResponse.json({ ok: true });
+  return proxyJsonNoRequest(`/drafts/${encodeURIComponent(id)}`, "Draft not found", "DELETE");
 }

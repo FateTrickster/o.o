@@ -4,22 +4,35 @@
 
 ## 技术栈
 
-- Next.js + TypeScript
-- 本地 JSON 文件存储
-- 数据文件：`data/questions.json`
+- Next.js + TypeScript 前端
+- FastAPI + SQLite 本地后端
+- 数据库文件：`backend/data/ai_literacy.db`
+- 初始 JSON 数据：`data/questions.json`、`data/knowledge.json`、`data/drafts.json`
 - 样例题库：`data/sample_questions.json`
 
 ## 安装与运行
 
 ```bash
 npm install
-npm run dev
+python -m pip install -r backend/requirements.txt
+```
+
+启动 Python 后端：
+
+```bash
+python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+启动 Next.js 前端：
+
+```bash
+npm run dev -- --port 3003
 ```
 
 打开浏览器访问：
 
 ```text
-http://localhost:3000
+http://127.0.0.1:3003
 ```
 
 生产构建：
@@ -43,7 +56,7 @@ npm run lint
 - 删除题目
 - 查看题目详情
 - 按一级维度、状态、难度、标签筛选
-- 搜索标题、题干和场景
+- 搜索编号、标题、题干和场景
 - 导出全部题库为 JSON
 - 从 JSON 批量导入题目
 
@@ -107,11 +120,11 @@ TypeScript 类型定义在 `types/question.ts`。
 
 ## 导出题库
 
-点击首页“导出 JSON”，系统会下载当前 `data/questions.json` 中的全部题目。
+点击首页“导出 JSON”，系统会从 Python 后端读取当前 SQLite 题库，并下载 JSON 文件。
 
 ## 数据存储说明
 
-当前版本使用本地 JSON 文件，便于查看、备份、迁移和版本管理。后续如果要支持正式考试、题目统计、自适应测评或多人协作，可以把 `lib/questions.ts` 替换为 SQLite 或云数据库实现，页面和类型结构可以继续复用。
+当前版本使用本地 SQLite 数据库作为运行时数据源，Next.js 的 `/api/*` 路由会代理到 FastAPI 后端。`data/*.json` 仍保留为初始数据、样例和迁移用数据。后续如果要支持正式考试、题目统计、自适应测评或多人协作，可以在 Python 后端继续扩展数据库表、出题任务和审题流程。
 
 ## LLM provider
 

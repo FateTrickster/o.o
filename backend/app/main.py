@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import List
+from typing import Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 
@@ -10,12 +9,16 @@ from .pipeline import generate_drafts as run_generate_drafts
 from .repositories import (
     accept_draft,
     create_knowledge,
+    create_knowledge_many,
+    create_question,
     delete_draft,
     delete_knowledge,
     delete_question,
+    filter_questions,
     get_draft,
     get_knowledge,
     get_question,
+    import_questions,
     list_drafts,
     list_knowledge,
     list_questions,
@@ -26,7 +29,9 @@ from .repositories import (
 )
 from .schemas import (
     GenerateDraftRequest,
+    ImportKnowledgeResult,
     ImportJsonRequest,
+    ImportQuestionsResult,
     KnowledgeEntry,
     KnowledgeInput,
     Question,
@@ -41,6 +46,12 @@ app = FastAPI(
     version="0.1.0",
     description="Python MVP for AI literacy draft generation and SQLite persistence.",
 )
+
+
+@app.on_event("startup")
+def startup() -> None:
+    init_db()
+    seed_framework()
 
 
 @app.get("/health")
@@ -71,13 +82,40 @@ def get_framework():
 
 
 @app.get("/knowledge", response_model=List[KnowledgeEntry])
-def get_knowledge_entries():
-    return list_knowledge()
+def get_knowledge_entries(
+    sourceType: Optional[str] = None,
+    tag: Optional[str] = None,
+    search: Optional[str] = None,
+):
+    entries = list_knowledge()
+    normalized_tag = tag.strip().lower() if tag else ""
+    normalized_search = search.strip().lower() if search else ""
+    filtered: List[KnowledgeEntry] = []
+
+    for entry in entries:
+        if sourceType and entry.sourceType != sourceType:
+            continue
+        if normalized_tag and not any(normalized_tag in item.lower() for item in entry.tags):
+            continue
+        if normalized_search:
+            haystack = " ".join(
+                [entry.title, entry.content, entry.sourceFileName, entry.sourceType, " ".join(entry.tags)]
+            ).lower()
+            if normalized_search not in haystack:
+                continue
+        filtered.append(entry)
+
+    return filtered
 
 
 @app.post("/knowledge", response_model=KnowledgeEntry)
 def create_knowledge_entry(request: KnowledgeInput):
     return create_knowledge(request)
+
+
+@app.post("/knowledge/import", response_model=ImportKnowledgeResult)
+def import_knowledge_entries(request: List[KnowledgeInput]):
+    return create_knowledge_many(request)
 
 
 @app.get("/knowledge/{entry_id}", response_model=KnowledgeEntry)
@@ -150,8 +188,34 @@ def accept_generated_draft(draft_id: str):
 
 
 @app.get("/questions", response_model=List[Question])
-def get_questions():
+def get_questions(
+    dimension: Optional[str] = None,
+    secondaryDimension: Optional[str] = None,
+    status: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    tag: Optional[str] = None,
+    search: Optional[str] = None,
+):
+    if any([dimension, secondaryDimension, status, difficulty, tag, search]):
+        return filter_questions(
+            dimension=dimension,
+            secondary_dimension=secondaryDimension,
+            status=status,
+            difficulty=difficulty,
+            tag=tag,
+            search=search,
+        )
     return list_questions()
+
+
+@app.post("/questions", response_model=Question)
+def create_formal_question(request: QuestionInput):
+    return create_question(request)
+
+
+@app.post("/questions/import", response_model=ImportQuestionsResult)
+def import_formal_questions(request: List[Dict]):
+    return import_questions(request)
 
 
 @app.get("/questions/{question_id}", response_model=Question)

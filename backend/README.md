@@ -2,7 +2,7 @@
 
 This backend is the first Python step for the AI literacy question pipeline.
 
-It does not replace the Next.js UI yet. It provides a standalone FastAPI service that can:
+It is now the runtime data source for the Next.js UI. The Next `/api/*` routes proxy to this FastAPI service for persisted question, knowledge, and draft data.
 
 - initialize a local SQLite database
 - seed the UACE framework
@@ -11,7 +11,7 @@ It does not replace the Next.js UI yet. It provides a standalone FastAPI service
 - store generated drafts in SQLite
 - list, view, create, edit, and delete knowledge entries
 - list, edit, delete, and accept generated drafts
-- list, view, edit, and delete formal questions
+- list, view, create, import, edit, and delete formal questions
 - accept a draft into the formal question table with an auto-incrementing `itemCode`
 
 ## Install
@@ -75,6 +75,7 @@ POST   /admin/import-json
 GET    /framework
 GET    /knowledge
 POST   /knowledge
+POST   /knowledge/import
 GET    /knowledge/{entry_id}
 PUT    /knowledge/{entry_id}
 DELETE /knowledge/{entry_id}
@@ -84,6 +85,8 @@ PUT    /drafts/{draft_id}
 DELETE /drafts/{draft_id}
 POST   /drafts/{draft_id}/accept
 GET    /questions
+POST   /questions
+POST   /questions/import
 GET    /questions/{question_id}
 PUT    /questions/{question_id}
 DELETE /questions/{question_id}

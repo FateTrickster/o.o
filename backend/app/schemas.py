@@ -89,6 +89,16 @@ class ImportJsonRequest(BaseModel):
     reset: bool = False
 
 
+class ImportQuestionsResult(BaseModel):
+    imported: int
+    total: int
+
+
+class ImportKnowledgeResult(BaseModel):
+    imported: int
+    total: int
+
+
 class ApiError(BaseModel):
     error: str
 

@@ -386,7 +386,7 @@ export default function KnowledgeBasePanel() {
       <section className="section-heading">
         <div>
           <h2>知识库</h2>
-          <p>本地 JSON 管理知识条目，不做文件导入和 LLM 处理。</p>
+          <p>本地 SQLite 管理知识条目，支持文件解析、切分、预览后导入。</p>
         </div>
         <div className="toolbar">
           <button className="primary" type="button" onClick={beginCreate}>

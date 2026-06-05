@@ -396,7 +396,7 @@ export default function QuestionBankApp() {
       <header className="topbar">
         <div>
           <h1>AI素养测评题库系统</h1>
-          <p>本地 JSON 存储的题库管理 MVP，当前聚焦题目维护和数据进出。</p>
+          <p>本地 FastAPI + SQLite 的题库管理 MVP，当前聚焦题目维护和数据进出。</p>
         </div>
         {activeModule === "questions" ? (
           <div className="toolbar">

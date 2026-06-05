@@ -151,6 +151,15 @@ def create_knowledge(input_data: KnowledgeInput) -> KnowledgeEntry:
     return entry
 
 
+def create_knowledge_many(inputs: List[KnowledgeInput]) -> Dict[str, int]:
+    created = [KnowledgeEntry(**input_data.dict(), id=str(uuid.uuid4()), createdAt=now_iso(), updatedAt=now_iso()) for input_data in inputs]
+    with connect() as connection:
+        for entry in created:
+            _insert_or_replace_knowledge(connection, entry)
+        total = connection.execute("SELECT COUNT(*) AS count FROM knowledge_entries").fetchone()["count"]
+    return {"imported": len(created), "total": total}
+
+
 def update_knowledge(entry_id: str, input_data: KnowledgeInput) -> Optional[KnowledgeEntry]:
     current = get_knowledge(entry_id)
     if not current:
@@ -449,12 +458,77 @@ def accept_draft(draft_id: str) -> Optional[Question]:
     return question
 
 
+def create_question(input_data: QuestionInput) -> Question:
+    selection = normalize_framework_selection(
+        input_data.dimension,
+        input_data.secondaryDimension,
+        f"{input_data.title} {input_data.question} {input_data.scenario} {input_data.subSkill} {' '.join(input_data.tags)}",
+    )
+    now = now_iso()
+    with connect() as connection:
+        question = Question(
+            **input_data.dict(exclude={"dimension", "secondaryDimension"}),
+            dimension=selection["dimension"],
+            secondaryDimension=selection["secondaryDimension"],
+            id=str(uuid.uuid4()),
+            itemCode=_next_item_code(connection),
+            createdAt=now,
+            updatedAt=now,
+        )
+        _insert_or_replace_question(connection, question)
+    return question
+
+
 def list_questions() -> List[Question]:
     with connect() as connection:
         rows = connection.execute(
             "SELECT * FROM questions ORDER BY item_code ASC"
         ).fetchall()
         return [_row_to_question(dict(row)) for row in rows]
+
+
+def filter_questions(
+    dimension: Optional[str] = None,
+    secondary_dimension: Optional[str] = None,
+    status: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    tag: Optional[str] = None,
+    search: Optional[str] = None,
+) -> List[Question]:
+    questions = list_questions()
+    normalized_tag = tag.strip().lower() if tag else ""
+    normalized_search = search.strip().lower() if search else ""
+    filtered: List[Question] = []
+
+    for question in questions:
+        if dimension and question.dimension != dimension:
+            continue
+        if secondary_dimension and question.secondaryDimension != secondary_dimension:
+            continue
+        if status and question.status != status:
+            continue
+        if difficulty and question.difficultyEstimate != difficulty:
+            continue
+        if normalized_tag and not any(normalized_tag in item.lower() for item in question.tags):
+            continue
+        if normalized_search:
+            haystack = " ".join(
+                [
+                    question.itemCode,
+                    question.title,
+                    question.question,
+                    question.scenario,
+                    question.dimension,
+                    question.secondaryDimension,
+                    question.subSkill,
+                    " ".join(question.tags),
+                ]
+            ).lower()
+            if normalized_search not in haystack:
+                continue
+        filtered.append(question)
+
+    return filtered
 
 
 def get_question(question_id: str) -> Optional[Question]:
@@ -493,6 +567,41 @@ def delete_question(question_id: str) -> bool:
     with connect() as connection:
         cursor = connection.execute("DELETE FROM questions WHERE id = ?", (question_id,))
         return cursor.rowcount > 0
+
+
+def _is_valid_item_code(value: Optional[str]) -> bool:
+    return bool(value and len(value) == 5 and value.isdigit())
+
+
+def import_questions(imported: List[Dict]) -> Dict[str, int]:
+    with connect() as connection:
+        for raw in imported:
+            incoming_id = raw.get("id") or str(uuid.uuid4())
+            current = connection.execute(
+                "SELECT * FROM questions WHERE id = ?", (incoming_id,)
+            ).fetchone()
+            incoming_code = raw.get("itemCode")
+            item_code = incoming_code if _is_valid_item_code(incoming_code) else None
+
+            if item_code:
+                conflict = connection.execute(
+                    "SELECT id FROM questions WHERE item_code = ? AND id != ?",
+                    (item_code, incoming_id),
+                ).fetchone()
+                if conflict:
+                    item_code = None
+
+            if not item_code and current:
+                item_code = current["item_code"]
+            if not item_code:
+                item_code = _next_item_code(connection)
+
+            question = _question_from_raw({**raw, "id": incoming_id, "itemCode": item_code}, item_code)
+            _insert_or_replace_question(connection, question)
+
+        total = connection.execute("SELECT COUNT(*) AS count FROM questions").fetchone()["count"]
+
+    return {"imported": len(imported), "total": total}
 
 
 def _question_input_from_raw(raw: Dict) -> QuestionInput:

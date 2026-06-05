@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
-import { readDrafts } from "@/lib/drafts";
+import { NextRequest } from "next/server";
+import { proxyJson, proxyJsonNoRequest } from "@/lib/backendApi";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const drafts = await readDrafts();
-  return NextResponse.json(drafts);
+  return proxyJsonNoRequest("/drafts", "Failed to load drafts");
 }
 
-export async function POST() {
-  return NextResponse.json({ error: "Use /api/drafts/generate to create drafts" }, { status: 405 });
+export async function POST(request: NextRequest) {
+  return proxyJson(request, "/drafts/generate", "Failed to generate drafts");
 }
