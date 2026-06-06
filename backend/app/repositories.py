@@ -8,11 +8,14 @@ from .framework import UACE_FRAMEWORK, normalize_framework_selection
 from .schemas import (
     GenerationBatch,
     GenerationJob,
+    KnowledgeTaxonomyItem,
     KnowledgeEntry,
     KnowledgeInput,
     Question,
     QuestionDraft,
     QuestionInput,
+    QuestionType,
+    QuestionTypeExample,
 )
 
 
@@ -32,6 +35,7 @@ def _row_to_knowledge(row: Dict) -> KnowledgeEntry:
 def _row_to_draft(row: Dict) -> QuestionDraft:
     return QuestionDraft(
         id=row["id"],
+        questionType=row["question_type"] or "单选",
         title=row["title"],
         question=row["question"],
         scenario=row["scenario"],
@@ -40,10 +44,13 @@ def _row_to_draft(row: Dict) -> QuestionDraft:
         explanation=row["explanation"],
         dimension=row["dimension"],
         secondaryDimension=row["secondary_dimension"],
+        tertiaryDimension=row["tertiary_dimension"] or "",
+        quaternaryDimension=row["quaternary_dimension"] or "",
         subSkill=row["sub_skill"],
         cognitiveLevel=row["cognitive_level"],
         difficultyEstimate=row["difficulty_estimate"],
         tags=from_json(row["tags_json"], []),
+        knowledgePoints=from_json(row["knowledge_points_json"], []),
         sourceReference=row["source_reference"] or "",
         status=row["status"],
         sourceKnowledgeIds=from_json(row["source_knowledge_ids_json"], []),
@@ -58,6 +65,7 @@ def _row_to_question(row: Dict) -> Question:
     return Question(
         id=row["id"],
         itemCode=row["item_code"],
+        questionType=row["question_type"] or "单选",
         title=row["title"],
         question=row["question"],
         scenario=row["scenario"],
@@ -66,10 +74,13 @@ def _row_to_question(row: Dict) -> Question:
         explanation=row["explanation"],
         dimension=row["dimension"],
         secondaryDimension=row["secondary_dimension"],
+        tertiaryDimension=row["tertiary_dimension"] or "",
+        quaternaryDimension=row["quaternary_dimension"] or "",
         subSkill=row["sub_skill"],
         cognitiveLevel=row["cognitive_level"],
         difficultyEstimate=row["difficulty_estimate"],
         tags=from_json(row["tags_json"], []),
+        knowledgePoints=from_json(row["knowledge_points_json"], []),
         sourceReference=row["source_reference"] or "",
         status=row["status"],
         createdAt=row["created_at"],
@@ -111,6 +122,54 @@ def _row_to_generation_batch(row: Dict) -> GenerationBatch:
         startedAt=row["started_at"],
         completedAt=row["completed_at"],
         error=row["error"],
+    )
+
+
+def _row_to_question_type(row: Dict) -> QuestionType:
+    return QuestionType(
+        id=row["id"],
+        name=row["name"],
+        description=row["description"] or "",
+        sourceSheet=row["source_sheet"] or "",
+        exampleCount=row["example_count"],
+        createdAt=row["created_at"],
+        updatedAt=row["updated_at"],
+    )
+
+
+def _row_to_question_type_example(row: Dict) -> QuestionTypeExample:
+    return QuestionTypeExample(
+        id=row["id"],
+        questionType=row["question_type"],
+        question=row["question"],
+        task=row["task"] or "",
+        referenceAnswer=row["reference_answer"] or "",
+        scoringCriteria=row["scoring_criteria"] or "",
+        knowledgePointRaw=row["knowledge_point_raw"] or "",
+        sourceReference=row["source_reference"] or "",
+        sourceSheet=row["source_sheet"] or "",
+        sourceRow=row["source_row"] or 0,
+        createdAt=row["created_at"],
+        updatedAt=row["updated_at"],
+    )
+
+
+def _row_to_knowledge_taxonomy_item(row: Dict) -> KnowledgeTaxonomyItem:
+    return KnowledgeTaxonomyItem(
+        id=row["id"],
+        gradeLevel=row["grade_level"] or "",
+        primaryDimension=row["primary_dimension"] or "",
+        secondaryDimension=row["secondary_dimension"] or "",
+        tertiaryDimension=row["tertiary_dimension"] or "",
+        quaternaryDimension=row["quaternary_dimension"] or "",
+        knowledgePoint=row["knowledge_point"] or "",
+        knowledgeDescription=row["knowledge_description"] or "",
+        sourceReference=row["source_reference"] or "",
+        note=row["note"] or "",
+        sourceSheet=row["source_sheet"] or "",
+        sourceRow=row["source_row"] or 0,
+        createdAt=row["created_at"],
+        updatedAt=row["updated_at"],
     )
 
 
@@ -380,6 +439,134 @@ def list_generation_jobs() -> List[GenerationJob]:
         return [_row_to_generation_job(dict(row)) for row in rows]
 
 
+def list_question_types() -> List[QuestionType]:
+    with connect() as connection:
+        rows = connection.execute(
+            "SELECT * FROM question_types ORDER BY example_count DESC, name ASC"
+        ).fetchall()
+        return [_row_to_question_type(dict(row)) for row in rows]
+
+
+def list_question_type_examples(question_type: Optional[str] = None) -> List[QuestionTypeExample]:
+    query = "SELECT * FROM question_type_examples"
+    params: List[str] = []
+    if question_type:
+        query += " WHERE question_type = ?"
+        params.append(question_type)
+    query += " ORDER BY source_sheet ASC, source_row ASC LIMIT 500"
+    with connect() as connection:
+        rows = connection.execute(query, params).fetchall()
+        return [_row_to_question_type_example(dict(row)) for row in rows]
+
+
+def list_knowledge_taxonomy(
+    grade_level: Optional[str] = None,
+    primary_dimension: Optional[str] = None,
+    secondary_dimension: Optional[str] = None,
+) -> List[KnowledgeTaxonomyItem]:
+    query = "SELECT * FROM knowledge_taxonomy WHERE 1 = 1"
+    params: List[str] = []
+    if grade_level:
+        query += " AND grade_level = ?"
+        params.append(grade_level)
+    if primary_dimension:
+        query += " AND primary_dimension = ?"
+        params.append(primary_dimension)
+    if secondary_dimension:
+        query += " AND secondary_dimension = ?"
+        params.append(secondary_dimension)
+    query += " ORDER BY grade_level ASC, source_row ASC LIMIT 1000"
+    with connect() as connection:
+        rows = connection.execute(query, params).fetchall()
+        return [_row_to_knowledge_taxonomy_item(dict(row)) for row in rows]
+
+
+def import_reference_data(root_data_dir: Path) -> Dict[str, int]:
+    counts = {"questionTypes": 0, "questionTypeExamples": 0, "knowledgeTaxonomy": 0}
+    now = now_iso()
+    with connect() as connection:
+        question_types_file = root_data_dir / "question_types.json"
+        if question_types_file.exists():
+            for raw in json.loads(question_types_file.read_text(encoding="utf-8")):
+                connection.execute(
+                    """
+                    INSERT OR REPLACE INTO question_types
+                    (id, name, description, source_sheet, example_count, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        raw.get("id"),
+                        raw.get("name", ""),
+                        raw.get("description", ""),
+                        raw.get("sourceSheet", ""),
+                        raw.get("exampleCount", 0),
+                        now,
+                        now,
+                    ),
+                )
+                counts["questionTypes"] += 1
+
+        examples_file = root_data_dir / "question_type_examples.json"
+        if examples_file.exists():
+            for raw in json.loads(examples_file.read_text(encoding="utf-8")):
+                connection.execute(
+                    """
+                    INSERT OR REPLACE INTO question_type_examples
+                    (id, question_type, question, task, reference_answer,
+                     scoring_criteria, knowledge_point_raw, source_reference,
+                     source_sheet, source_row, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        raw.get("id"),
+                        raw.get("questionType", ""),
+                        raw.get("question", ""),
+                        raw.get("task", ""),
+                        raw.get("referenceAnswer", ""),
+                        raw.get("scoringCriteria", ""),
+                        raw.get("knowledgePointRaw", ""),
+                        raw.get("sourceReference", ""),
+                        raw.get("sourceSheet", ""),
+                        raw.get("sourceRow", 0),
+                        now,
+                        now,
+                    ),
+                )
+                counts["questionTypeExamples"] += 1
+
+        taxonomy_file = root_data_dir / "knowledge_taxonomy.json"
+        if taxonomy_file.exists():
+            for raw in json.loads(taxonomy_file.read_text(encoding="utf-8")):
+                connection.execute(
+                    """
+                    INSERT OR REPLACE INTO knowledge_taxonomy
+                    (id, grade_level, primary_dimension, secondary_dimension,
+                     tertiary_dimension, quaternary_dimension, knowledge_point,
+                     knowledge_description, source_reference, note, source_sheet,
+                     source_row, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        raw.get("id"),
+                        raw.get("gradeLevel", ""),
+                        raw.get("primaryDimension", ""),
+                        raw.get("secondaryDimension", ""),
+                        raw.get("tertiaryDimension", ""),
+                        raw.get("quaternaryDimension", ""),
+                        raw.get("knowledgePoint", ""),
+                        raw.get("knowledgeDescription", ""),
+                        raw.get("sourceReference", ""),
+                        raw.get("note", ""),
+                        raw.get("sourceSheet", ""),
+                        raw.get("sourceRow", 0),
+                        now,
+                        now,
+                    ),
+                )
+                counts["knowledgeTaxonomy"] += 1
+    return counts
+
+
 def list_drafts() -> List[QuestionDraft]:
     with connect() as connection:
         rows = connection.execute(
@@ -425,15 +612,17 @@ def create_drafts(
             connection.execute(
                 """
                 INSERT INTO question_drafts
-                (id, title, question, scenario, options_json, correct_answer,
+                (id, question_type, title, question, scenario, options_json, correct_answer,
                  explanation, dimension, secondary_dimension, sub_skill,
-                 cognitive_level, difficulty_estimate, tags_json, source_reference,
+                 tertiary_dimension, quaternary_dimension, cognitive_level,
+                 difficulty_estimate, tags_json, knowledge_points_json, source_reference,
                  status, source_knowledge_ids_json, generation_requirement,
                  generation_job_id, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     draft.id,
+                    draft.questionType,
                     draft.title,
                     draft.question,
                     draft.scenario,
@@ -443,9 +632,12 @@ def create_drafts(
                     draft.dimension,
                     draft.secondaryDimension,
                     draft.subSkill,
+                    draft.tertiaryDimension,
+                    draft.quaternaryDimension,
                     draft.cognitiveLevel,
                     draft.difficultyEstimate,
                     to_json(draft.tags),
+                    to_json(draft.knowledgePoints),
                     draft.sourceReference,
                     draft.status,
                     to_json(draft.sourceKnowledgeIds),
@@ -463,15 +655,17 @@ def _insert_or_replace_draft(connection, draft: QuestionDraft) -> None:
     connection.execute(
         """
         INSERT OR REPLACE INTO question_drafts
-        (id, title, question, scenario, options_json, correct_answer,
+        (id, question_type, title, question, scenario, options_json, correct_answer,
          explanation, dimension, secondary_dimension, sub_skill,
-         cognitive_level, difficulty_estimate, tags_json, source_reference,
+         tertiary_dimension, quaternary_dimension, cognitive_level,
+         difficulty_estimate, tags_json, knowledge_points_json, source_reference,
          status, source_knowledge_ids_json, generation_requirement,
          generation_job_id, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             draft.id,
+            draft.questionType,
             draft.title,
             draft.question,
             draft.scenario,
@@ -481,9 +675,12 @@ def _insert_or_replace_draft(connection, draft: QuestionDraft) -> None:
             draft.dimension,
             draft.secondaryDimension,
             draft.subSkill,
+            draft.tertiaryDimension,
+            draft.quaternaryDimension,
             draft.cognitiveLevel,
             draft.difficultyEstimate,
             to_json(draft.tags),
+            to_json(draft.knowledgePoints),
             draft.sourceReference,
             draft.status,
             to_json(draft.sourceKnowledgeIds),
@@ -499,15 +696,17 @@ def _insert_or_replace_question(connection, question: Question) -> None:
     connection.execute(
         """
         INSERT OR REPLACE INTO questions
-        (id, item_code, title, question, scenario, options_json,
+        (id, item_code, question_type, title, question, scenario, options_json,
          correct_answer, explanation, dimension, secondary_dimension,
-         sub_skill, cognitive_level, difficulty_estimate, tags_json,
-         source_reference, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         sub_skill, tertiary_dimension, quaternary_dimension, cognitive_level,
+         difficulty_estimate, tags_json, knowledge_points_json, source_reference,
+         status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             question.id,
             question.itemCode,
+            question.questionType,
             question.title,
             question.question,
             question.scenario,
@@ -517,9 +716,12 @@ def _insert_or_replace_question(connection, question: Question) -> None:
             question.dimension,
             question.secondaryDimension,
             question.subSkill,
+            question.tertiaryDimension,
+            question.quaternaryDimension,
             question.cognitiveLevel,
             question.difficultyEstimate,
             to_json(question.tags),
+            to_json(question.knowledgePoints),
             question.sourceReference,
             question.status,
             question.createdAt,
@@ -656,13 +858,17 @@ def filter_questions(
             haystack = " ".join(
                 [
                     question.itemCode,
+                    question.questionType,
                     question.title,
                     question.question,
                     question.scenario,
                     question.dimension,
                     question.secondaryDimension,
+                    question.tertiaryDimension,
+                    question.quaternaryDimension,
                     question.subSkill,
                     " ".join(question.tags),
+                    " ".join(question.knowledgePoints),
                 ]
             ).lower()
             if normalized_search not in haystack:
@@ -747,12 +953,14 @@ def import_questions(imported: List[Dict]) -> Dict[str, int]:
 
 def _question_input_from_raw(raw: Dict) -> QuestionInput:
     tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    knowledge_points = raw.get("knowledgePoints") if isinstance(raw.get("knowledgePoints"), list) else []
     selection = normalize_framework_selection(
         raw.get("dimension", ""),
         raw.get("secondaryDimension", ""),
-        f"{raw.get('title', '')} {raw.get('question', '')} {raw.get('scenario', '')} {raw.get('subSkill', '')} {' '.join(tags)}",
+        f"{raw.get('title', '')} {raw.get('question', '')} {raw.get('scenario', '')} {raw.get('subSkill', '')} {' '.join(tags)} {' '.join(str(item) for item in knowledge_points)}",
     )
     return QuestionInput(
+        questionType=raw.get("questionType", "单选") or "单选",
         title=raw.get("title", ""),
         question=raw.get("question", ""),
         scenario=raw.get("scenario", ""),
@@ -761,10 +969,13 @@ def _question_input_from_raw(raw: Dict) -> QuestionInput:
         explanation=raw.get("explanation", ""),
         dimension=selection["dimension"],
         secondaryDimension=selection["secondaryDimension"],
+        tertiaryDimension=raw.get("tertiaryDimension", ""),
+        quaternaryDimension=raw.get("quaternaryDimension", ""),
         subSkill=raw.get("subSkill") or selection["secondaryDimension"],
         cognitiveLevel=raw.get("cognitiveLevel", "apply"),
         difficultyEstimate=raw.get("difficultyEstimate", "medium"),
         tags=tags,
+        knowledgePoints=[str(item).strip() for item in knowledge_points if str(item).strip()],
         sourceReference=raw.get("sourceReference", ""),
         status=raw.get("status", "draft"),
     )

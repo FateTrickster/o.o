@@ -10,6 +10,24 @@ export type CognitiveLevel =
 
 export type DifficultyEstimate = "easy" | "medium" | "hard";
 
+export type QuestionType =
+  | "单选"
+  | "多选"
+  | "判断"
+  | "填空"
+  | "案例分析"
+  | "情景任务"
+  | "挑战任务"
+  | "技术主观题"
+  | "情境决策题"
+  | "短答建构题"
+  | "案例分析题"
+  | "解释理由题"
+  | "过程说明题"
+  | "方案设计题"
+  | "项目任务题"
+  | string;
+
 export interface QuestionOption {
   id: string;
   text: string;
@@ -18,6 +36,7 @@ export interface QuestionOption {
 export interface Question {
   id: string;
   itemCode: string;
+  questionType?: QuestionType;
   title: string;
   question: string;
   scenario: string;
@@ -26,10 +45,13 @@ export interface Question {
   explanation: string;
   dimension: string;
   secondaryDimension: string;
+  tertiaryDimension?: string;
+  quaternaryDimension?: string;
   subSkill: string;
   cognitiveLevel: CognitiveLevel;
   difficultyEstimate: DifficultyEstimate;
   tags: string[];
+  knowledgePoints?: string[];
   sourceReference: string;
   status: QuestionStatus;
   createdAt: string;

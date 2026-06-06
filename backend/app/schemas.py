@@ -8,6 +8,7 @@ class QuestionOption(BaseModel):
 
 
 class QuestionInput(BaseModel):
+    questionType: str = "单选"
     title: str
     question: str
     scenario: str
@@ -16,10 +17,13 @@ class QuestionInput(BaseModel):
     explanation: str
     dimension: str
     secondaryDimension: str
+    tertiaryDimension: str = ""
+    quaternaryDimension: str = ""
     subSkill: str
     cognitiveLevel: str
     difficultyEstimate: str
     tags: List[str] = Field(default_factory=list)
+    knowledgePoints: List[str] = Field(default_factory=list)
     sourceReference: str
     status: str = "draft"
 
@@ -101,6 +105,48 @@ class GenerationBatch(BaseModel):
     startedAt: str
     completedAt: Optional[str] = None
     error: Optional[str] = None
+
+
+class QuestionType(BaseModel):
+    id: str
+    name: str
+    description: str = ""
+    sourceSheet: str = ""
+    exampleCount: int = 0
+    createdAt: str
+    updatedAt: str
+
+
+class QuestionTypeExample(BaseModel):
+    id: str
+    questionType: str
+    question: str
+    task: str = ""
+    referenceAnswer: str = ""
+    scoringCriteria: str = ""
+    knowledgePointRaw: str = ""
+    sourceReference: str = ""
+    sourceSheet: str = ""
+    sourceRow: int = 0
+    createdAt: str
+    updatedAt: str
+
+
+class KnowledgeTaxonomyItem(BaseModel):
+    id: str
+    gradeLevel: str = ""
+    primaryDimension: str = ""
+    secondaryDimension: str = ""
+    tertiaryDimension: str = ""
+    quaternaryDimension: str = ""
+    knowledgePoint: str = ""
+    knowledgeDescription: str = ""
+    sourceReference: str = ""
+    note: str = ""
+    sourceSheet: str = ""
+    sourceRow: int = 0
+    createdAt: str
+    updatedAt: str
 
 
 class ImportJsonRequest(BaseModel):

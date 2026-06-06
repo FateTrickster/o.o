@@ -31,6 +31,7 @@ def _extract_json(content: str) -> Dict[str, Any]:
 
 def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
     tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    knowledge_points = raw.get("knowledgePoints") if isinstance(raw.get("knowledgePoints"), list) else []
     selection = normalize_framework_selection(
         raw.get("dimension", ""),
         raw.get("secondaryDimension", ""),
@@ -41,11 +42,13 @@ def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
                 raw.get("scenario", ""),
                 raw.get("subSkill", ""),
                 " ".join(str(tag) for tag in tags),
+                " ".join(str(point) for point in knowledge_points),
             ]
         ),
     )
     raw = {**raw, **selection}
     return QuestionInput(
+        questionType=str(raw.get("questionType", "单选")).strip() or "单选",
         title=str(raw.get("title", "")).strip(),
         question=str(raw.get("question", "")).strip(),
         scenario=str(raw.get("scenario", "")).strip(),
@@ -54,10 +57,13 @@ def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
         explanation=str(raw.get("explanation", "")).strip(),
         dimension=raw["dimension"],
         secondaryDimension=raw["secondaryDimension"],
+        tertiaryDimension=str(raw.get("tertiaryDimension", "")).strip(),
+        quaternaryDimension=str(raw.get("quaternaryDimension", "")).strip(),
         subSkill=str(raw.get("subSkill", "")).strip() or raw["secondaryDimension"],
         cognitiveLevel=str(raw.get("cognitiveLevel", "apply")).strip(),
         difficultyEstimate=str(raw.get("difficultyEstimate", "medium")).strip(),
         tags=[str(tag).strip() for tag in tags if str(tag).strip()],
+        knowledgePoints=[str(point).strip() for point in knowledge_points if str(point).strip()],
         sourceReference=str(raw.get("sourceReference", "")).strip(),
         status=str(raw.get("status", "draft")).strip() or "draft",
     )

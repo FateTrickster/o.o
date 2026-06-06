@@ -52,6 +52,13 @@ def execute(query: str, params: Iterable[Any] = ()) -> None:
         connection.execute(query, tuple(params))
 
 
+def _ensure_column(connection: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+    rows = connection.execute(f"PRAGMA table_info({table})").fetchall()
+    existing = {row["name"] for row in rows}
+    if column not in existing:
+        connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+
 def init_db() -> Path:
     with connect() as connection:
         connection.executescript(
@@ -152,6 +159,53 @@ def init_db() -> Path:
               created_at TEXT NOT NULL,
               updated_at TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS question_types (
+              id TEXT PRIMARY KEY,
+              name TEXT NOT NULL UNIQUE,
+              description TEXT,
+              source_sheet TEXT,
+              example_count INTEGER NOT NULL DEFAULT 0,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS question_type_examples (
+              id TEXT PRIMARY KEY,
+              question_type TEXT NOT NULL,
+              question TEXT NOT NULL,
+              task TEXT,
+              reference_answer TEXT,
+              scoring_criteria TEXT,
+              knowledge_point_raw TEXT,
+              source_reference TEXT,
+              source_sheet TEXT,
+              source_row INTEGER,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS knowledge_taxonomy (
+              id TEXT PRIMARY KEY,
+              grade_level TEXT,
+              primary_dimension TEXT,
+              secondary_dimension TEXT,
+              tertiary_dimension TEXT,
+              quaternary_dimension TEXT,
+              knowledge_point TEXT,
+              knowledge_description TEXT,
+              source_reference TEXT,
+              note TEXT,
+              source_sheet TEXT,
+              source_row INTEGER,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
             """
         )
+        for table in ["question_drafts", "questions"]:
+            _ensure_column(connection, table, "question_type", "TEXT NOT NULL DEFAULT '单选'")
+            _ensure_column(connection, table, "tertiary_dimension", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "quaternary_dimension", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "knowledge_points_json", "TEXT NOT NULL DEFAULT '[]'")
     return get_db_path()

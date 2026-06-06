@@ -9,6 +9,9 @@ from .pipeline import generate_drafts as run_generate_drafts
 from .repositories import (
     accept_draft,
     list_generation_batches,
+    list_knowledge_taxonomy,
+    list_question_type_examples,
+    list_question_types,
     create_knowledge,
     create_knowledge_many,
     create_question,
@@ -38,9 +41,12 @@ from .schemas import (
     ImportQuestionsResult,
     KnowledgeEntry,
     KnowledgeInput,
+    KnowledgeTaxonomyItem,
     Question,
     QuestionDraft,
     QuestionInput,
+    QuestionType,
+    QuestionTypeExample,
 )
 from .seed import initialize_from_json
 
@@ -83,6 +89,25 @@ def admin_import_json(request: ImportJsonRequest):
 @app.get("/framework")
 def get_framework():
     return UACE_FRAMEWORK
+
+
+@app.get("/question-types", response_model=List[QuestionType])
+def get_question_types():
+    return list_question_types()
+
+
+@app.get("/question-type-examples", response_model=List[QuestionTypeExample])
+def get_question_type_examples(questionType: Optional[str] = None):
+    return list_question_type_examples(questionType)
+
+
+@app.get("/knowledge-taxonomy", response_model=List[KnowledgeTaxonomyItem])
+def get_knowledge_taxonomy(
+    gradeLevel: Optional[str] = None,
+    primaryDimension: Optional[str] = None,
+    secondaryDimension: Optional[str] = None,
+):
+    return list_knowledge_taxonomy(gradeLevel, primaryDimension, secondaryDimension)
 
 
 @app.get("/knowledge", response_model=List[KnowledgeEntry])

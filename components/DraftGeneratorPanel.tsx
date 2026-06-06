@@ -4,11 +4,28 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
 import { KnowledgeEntry } from "@/types/knowledge";
 import { GenerationBatch, GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
-import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus } from "@/types/question";
+import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus, QuestionType } from "@/types/question";
 
 const cognitiveOptions: CognitiveLevel[] = ["remember", "understand", "apply", "analyze", "evaluate", "create"];
 const difficultyOptions: DifficultyEstimate[] = ["easy", "medium", "hard"];
 const statusOptions: QuestionStatus[] = ["draft", "reviewed", "tested", "retired"];
+const questionTypeOptions: QuestionType[] = [
+  "单选",
+  "多选",
+  "判断",
+  "填空",
+  "案例分析",
+  "情景任务",
+  "挑战任务",
+  "技术主观题",
+  "情境决策题",
+  "短答建构题",
+  "案例分析题",
+  "解释理由题",
+  "过程说明题",
+  "方案设计题",
+  "项目任务题"
+];
 
 function toggleValue(values: string[], value: string) {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
@@ -57,6 +74,7 @@ function jobStatusText(status: string) {
 
 function toDraftInput(draft: QuestionDraft): QuestionDraftInput {
   return {
+    questionType: draft.questionType || "单选",
     title: draft.title,
     question: draft.question,
     scenario: draft.scenario,
@@ -65,10 +83,13 @@ function toDraftInput(draft: QuestionDraft): QuestionDraftInput {
     explanation: draft.explanation,
     dimension: draft.dimension,
     secondaryDimension: draft.secondaryDimension,
+    tertiaryDimension: draft.tertiaryDimension || "",
+    quaternaryDimension: draft.quaternaryDimension || "",
     subSkill: draft.subSkill,
     cognitiveLevel: draft.cognitiveLevel,
     difficultyEstimate: draft.difficultyEstimate,
     tags: draft.tags,
+    knowledgePoints: draft.knowledgePoints || [],
     sourceReference: draft.sourceReference,
     status: draft.status,
     sourceKnowledgeIds: draft.sourceKnowledgeIds,
@@ -88,6 +109,7 @@ export default function DraftGeneratorPanel() {
   const [generationJobs, setGenerationJobs] = useState<GenerationJob[]>([]);
   const [generationBatches, setGenerationBatches] = useState<GenerationBatch[]>([]);
   const [tagsTextById, setTagsTextById] = useState<Record<string, string>>({});
+  const [knowledgePointsTextById, setKnowledgePointsTextById] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [savingId, setSavingId] = useState("");
@@ -122,6 +144,9 @@ export default function DraftGeneratorPanel() {
       setGenerationJobs(jobsData);
       setGenerationBatches(batchesData);
       setTagsTextById(Object.fromEntries(draftData.map((draft) => [draft.id, draft.tags.join(", ")])));
+      setKnowledgePointsTextById(
+        Object.fromEntries(draftData.map((draft) => [draft.id, (draft.knowledgePoints || []).join(", ")]))
+      );
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : "数据加载失败");
     } finally {
@@ -219,11 +244,18 @@ export default function DraftGeneratorPanel() {
           ? {
               ...draft,
               [field]: value,
-              ...(field === "dimension" ? { secondaryDimension: "" } : {})
+              ...(field === "dimension"
+                ? { secondaryDimension: "", tertiaryDimension: "", quaternaryDimension: "", knowledgePoints: [] }
+                : {}),
+              ...(field === "secondaryDimension" ? { tertiaryDimension: "", quaternaryDimension: "", knowledgePoints: [] } : {}),
+              ...(field === "tertiaryDimension" ? { quaternaryDimension: "", knowledgePoints: [] } : {})
             }
           : draft
       )
     );
+    if (field === "dimension" || field === "secondaryDimension" || field === "tertiaryDimension") {
+      setKnowledgePointsTextById((current) => ({ ...current, [id]: "" }));
+    }
   }
 
   function updateOption(draftId: string, optionIndex: number, field: keyof QuestionOption, value: string) {
@@ -286,6 +318,10 @@ export default function DraftGeneratorPanel() {
       tags: (tagsTextById[draft.id] ?? "")
         .split(",")
         .map((tag) => tag.trim())
+        .filter(Boolean),
+      knowledgePoints: (knowledgePointsTextById[draft.id] ?? "")
+        .split(",")
+        .map((point) => point.trim())
         .filter(Boolean)
     };
 
@@ -486,10 +522,17 @@ export default function DraftGeneratorPanel() {
               key={draft.id}
               draft={draft}
               tagsText={tagsTextById[draft.id] ?? ""}
+              knowledgePointsText={knowledgePointsTextById[draft.id] ?? ""}
               saving={savingId === draft.id}
               onFieldChange={updateDraftField}
               onTagsTextChange={(value) =>
                 setTagsTextById((current) => ({
+                  ...current,
+                  [draft.id]: value
+                }))
+              }
+              onKnowledgePointsTextChange={(value) =>
+                setKnowledgePointsTextById((current) => ({
                   ...current,
                   [draft.id]: value
                 }))
@@ -596,9 +639,11 @@ function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
 type DraftEditorProps = {
   draft: QuestionDraft;
   tagsText: string;
+  knowledgePointsText: string;
   saving: boolean;
   onFieldChange: <K extends keyof QuestionDraftInput>(id: string, field: K, value: QuestionDraftInput[K]) => void;
   onTagsTextChange: (value: string) => void;
+  onKnowledgePointsTextChange: (value: string) => void;
   onOptionChange: (draftId: string, optionIndex: number, field: keyof QuestionOption, value: string) => void;
   onOptionAdd: (draftId: string) => void;
   onOptionRemove: (draftId: string, optionIndex: number) => void;
@@ -610,9 +655,11 @@ type DraftEditorProps = {
 function DraftEditor({
   draft,
   tagsText,
+  knowledgePointsText,
   saving,
   onFieldChange,
   onTagsTextChange,
+  onKnowledgePointsTextChange,
   onOptionChange,
   onOptionAdd,
   onOptionRemove,
@@ -668,6 +715,19 @@ function DraftEditor({
           </button>
         </div>
         <label className="form-row">
+          <span>题型</span>
+          <select
+            value={draft.questionType || "单选"}
+            onChange={(event) => onFieldChange(draft.id, "questionType", event.target.value)}
+          >
+            {questionTypeOptions.map((questionType) => (
+              <option key={questionType} value={questionType}>
+                {questionType}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="form-row">
           <span>正确答案</span>
           <select value={draft.correctAnswer} onChange={(event) => onFieldChange(draft.id, "correctAnswer", event.target.value)}>
             {draft.options.map((option) => (
@@ -717,6 +777,20 @@ function DraftEditor({
           </select>
         </label>
         <label className="form-row">
+          <span>三级维度</span>
+          <input
+            value={draft.tertiaryDimension || ""}
+            onChange={(event) => onFieldChange(draft.id, "tertiaryDimension", event.target.value)}
+          />
+        </label>
+        <label className="form-row">
+          <span>四级维度</span>
+          <input
+            value={draft.quaternaryDimension || ""}
+            onChange={(event) => onFieldChange(draft.id, "quaternaryDimension", event.target.value)}
+          />
+        </label>
+        <label className="form-row">
           <span>二级能力</span>
           <input value={draft.subSkill} onChange={(event) => onFieldChange(draft.id, "subSkill", event.target.value)} />
         </label>
@@ -743,6 +817,10 @@ function DraftEditor({
         <label className="form-row full">
           <span>标签，用英文逗号分隔</span>
           <input value={tagsText} onChange={(event) => onTagsTextChange(event.target.value)} />
+        </label>
+        <label className="form-row full">
+          <span>知识点，用英文逗号分隔</span>
+          <input value={knowledgePointsText} onChange={(event) => onKnowledgePointsTextChange(event.target.value)} />
         </label>
         <label className="form-row full">
           <span>解析</span>

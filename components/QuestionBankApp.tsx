@@ -10,13 +10,31 @@ import {
   Question,
   QuestionInput,
   QuestionOption,
-  QuestionStatus
+  QuestionStatus,
+  QuestionType
 } from "@/types/question";
 
 type ActiveModule = "questions" | "knowledge" | "drafts";
 
 const statusOptions: QuestionStatus[] = ["draft", "reviewed", "tested", "retired"];
 const difficultyOptions: DifficultyEstimate[] = ["easy", "medium", "hard"];
+const questionTypeOptions: QuestionType[] = [
+  "单选",
+  "多选",
+  "判断",
+  "填空",
+  "案例分析",
+  "情景任务",
+  "挑战任务",
+  "技术主观题",
+  "情境决策题",
+  "短答建构题",
+  "案例分析题",
+  "解释理由题",
+  "过程说明题",
+  "方案设计题",
+  "项目任务题"
+];
 const cognitiveOptions: CognitiveLevel[] = [
   "remember",
   "understand",
@@ -27,6 +45,7 @@ const cognitiveOptions: CognitiveLevel[] = [
 ];
 
 const emptyInput: QuestionInput = {
+  questionType: "单选",
   title: "",
   question: "",
   scenario: "",
@@ -40,10 +59,13 @@ const emptyInput: QuestionInput = {
   explanation: "",
   dimension: "",
   secondaryDimension: "",
+  tertiaryDimension: "",
+  quaternaryDimension: "",
   subSkill: "",
   cognitiveLevel: "understand",
   difficultyEstimate: "medium",
   tags: [],
+  knowledgePoints: [],
   sourceReference: "",
   status: "draft"
 };
@@ -104,6 +126,7 @@ export default function QuestionBankApp() {
   const [editing, setEditing] = useState<Question | null>(null);
   const [form, setForm] = useState<QuestionInput>(emptyInput);
   const [tagsText, setTagsText] = useState("");
+  const [knowledgePointsText, setKnowledgePointsText] = useState("");
   const [filters, setFilters] = useState<Filters>(emptyFilters);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -169,12 +192,14 @@ export default function QuestionBankApp() {
     setEditing(null);
     setForm({ ...emptyInput, options: emptyInput.options.map((option) => ({ ...option })) });
     setTagsText("");
+    setKnowledgePointsText("");
     setError("");
   }
 
   function beginEdit(question: Question) {
     setEditing(question);
     setForm({
+      questionType: question.questionType || "单选",
       title: question.title,
       question: question.question,
       scenario: question.scenario,
@@ -183,14 +208,18 @@ export default function QuestionBankApp() {
       explanation: question.explanation,
       dimension: question.dimension,
       secondaryDimension: question.secondaryDimension,
+      tertiaryDimension: question.tertiaryDimension || "",
+      quaternaryDimension: question.quaternaryDimension || "",
       subSkill: question.subSkill,
       cognitiveLevel: question.cognitiveLevel,
       difficultyEstimate: question.difficultyEstimate,
       tags: [...question.tags],
+      knowledgePoints: [...(question.knowledgePoints || [])],
       sourceReference: question.sourceReference,
       status: question.status
     });
     setTagsText(question.tags.join(", "));
+    setKnowledgePointsText((question.knowledgePoints || []).join(", "));
     setError("");
   }
 
@@ -198,8 +227,15 @@ export default function QuestionBankApp() {
     setForm((current) => ({
       ...current,
       [field]: value,
-      ...(field === "dimension" ? { secondaryDimension: "" } : {})
+      ...(field === "dimension"
+        ? { secondaryDimension: "", tertiaryDimension: "", quaternaryDimension: "", knowledgePoints: [] }
+        : {}),
+      ...(field === "secondaryDimension" ? { tertiaryDimension: "", quaternaryDimension: "", knowledgePoints: [] } : {}),
+      ...(field === "tertiaryDimension" ? { quaternaryDimension: "", knowledgePoints: [] } : {})
     }));
+    if (field === "dimension" || field === "secondaryDimension" || field === "tertiaryDimension") {
+      setKnowledgePointsText("");
+    }
   }
 
   function updateOption(index: number, field: keyof QuestionOption, value: string) {
@@ -284,6 +320,10 @@ export default function QuestionBankApp() {
       tags: tagsText
         .split(",")
         .map((tag) => tag.trim())
+        .filter(Boolean),
+      knowledgePoints: knowledgePointsText
+        .split(",")
+        .map((point) => point.trim())
         .filter(Boolean)
     };
 
@@ -302,6 +342,7 @@ export default function QuestionBankApp() {
       setEditing(null);
       setForm({ ...emptyInput, options: emptyInput.options.map((option) => ({ ...option })) });
       setTagsText("");
+      setKnowledgePointsText("");
       await loadQuestions();
       setSelected(result as Question);
     } catch (currentError) {
@@ -520,6 +561,7 @@ export default function QuestionBankApp() {
                 <thead>
                   <tr>
                     <th style={{ width: 92 }}>编号</th>
+                    <th style={{ width: 110 }}>题型</th>
                     <th style={{ width: 360 }}>题目</th>
                     <th style={{ width: 170 }}>一级维度</th>
                     <th style={{ width: 320 }}>二级维度</th>
@@ -539,6 +581,7 @@ export default function QuestionBankApp() {
                       <td>
                         <span className="badge">{question.itemCode}</span>
                       </td>
+                      <td>{question.questionType || "单选"}</td>
                       <td className="title-cell">
                         <strong>{question.title}</strong>
                         <span>{question.scenario}</span>
@@ -592,11 +635,13 @@ export default function QuestionBankApp() {
             editing={editing}
             form={form}
             tagsText={tagsText}
+            knowledgePointsText={knowledgePointsText}
             saving={saving}
             secondaryDimensions={formSecondaryDimensions}
             onSubmit={submitForm}
             onCancel={beginCreate}
             onTagsTextChange={setTagsText}
+            onKnowledgePointsTextChange={setKnowledgePointsText}
             onFieldChange={updateField}
             onOptionChange={updateOption}
             onOptionAdd={addOption}
@@ -622,11 +667,13 @@ type QuestionFormProps = {
   editing: Question | null;
   form: QuestionInput;
   tagsText: string;
+  knowledgePointsText: string;
   saving: boolean;
   secondaryDimensions: readonly string[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
   onTagsTextChange: (value: string) => void;
+  onKnowledgePointsTextChange: (value: string) => void;
   onFieldChange: <K extends keyof QuestionInput>(field: K, value: QuestionInput[K]) => void;
   onOptionChange: (index: number, field: keyof QuestionOption, value: string) => void;
   onOptionAdd: () => void;
@@ -637,11 +684,13 @@ function QuestionForm({
   editing,
   form,
   tagsText,
+  knowledgePointsText,
   saving,
   secondaryDimensions,
   onSubmit,
   onCancel,
   onTagsTextChange,
+  onKnowledgePointsTextChange,
   onFieldChange,
   onOptionChange,
   onOptionAdd,
@@ -696,6 +745,19 @@ function QuestionForm({
               添加选项
             </button>
           </div>
+          <label className="form-row">
+            <span>题型</span>
+            <select
+              value={form.questionType || "单选"}
+              onChange={(event) => onFieldChange("questionType", event.target.value)}
+            >
+              {questionTypeOptions.map((questionType) => (
+                <option key={questionType} value={questionType}>
+                  {questionType}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="form-row">
             <span>正确答案</span>
             <select
@@ -755,6 +817,20 @@ function QuestionForm({
             </select>
           </label>
           <label className="form-row">
+            <span>三级维度</span>
+            <input
+              value={form.tertiaryDimension || ""}
+              onChange={(event) => onFieldChange("tertiaryDimension", event.target.value)}
+            />
+          </label>
+          <label className="form-row">
+            <span>四级维度</span>
+            <input
+              value={form.quaternaryDimension || ""}
+              onChange={(event) => onFieldChange("quaternaryDimension", event.target.value)}
+            />
+          </label>
+          <label className="form-row">
             <span>二级能力</span>
             <input value={form.subSkill} onChange={(event) => onFieldChange("subSkill", event.target.value)} required />
           </label>
@@ -787,6 +863,10 @@ function QuestionForm({
           <label className="form-row full">
             <span>标签，用英文逗号分隔</span>
             <input value={tagsText} onChange={(event) => onTagsTextChange(event.target.value)} />
+          </label>
+          <label className="form-row full">
+            <span>知识点，用英文逗号分隔</span>
+            <input value={knowledgePointsText} onChange={(event) => onKnowledgePointsTextChange(event.target.value)} />
           </label>
           <label className="form-row full">
             <span>解析</span>
@@ -870,8 +950,11 @@ function QuestionDetail({ question, onEdit, onDelete }: QuestionDetailProps) {
         <p>{question.explanation}</p>
 
         <div className="badge-row">
+          <span className="badge">{question.questionType || "单选"}</span>
           <span className="badge">{question.dimension}</span>
           <span className="badge">{question.secondaryDimension}</span>
+          {question.tertiaryDimension ? <span className="badge">{question.tertiaryDimension}</span> : null}
+          {question.quaternaryDimension ? <span className="badge">{question.quaternaryDimension}</span> : null}
           <span className="badge">{question.subSkill}</span>
           <span className="badge">{cognitiveText(question.cognitiveLevel)}</span>
           <span className="badge">{difficultyText(question.difficultyEstimate)}</span>
@@ -881,6 +964,13 @@ function QuestionDetail({ question, onEdit, onDelete }: QuestionDetailProps) {
         <h3>标签</h3>
         <div className="badge-row">
           {question.tags.length > 0 ? question.tags.map((tag) => <span className="badge" key={tag}>{tag}</span>) : "无"}
+        </div>
+
+        <h3>知识点</h3>
+        <div className="badge-row">
+          {question.knowledgePoints && question.knowledgePoints.length > 0
+            ? question.knowledgePoints.map((point) => <span className="badge" key={point}>{point}</span>)
+            : "无"}
         </div>
 
         <h3>来源</h3>

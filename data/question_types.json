@@ -1,0 +1,107 @@
+[
+  {
+    "id": "qt-443f46c76ebe",
+    "name": "多选",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 30
+  },
+  {
+    "id": "qt-e38bddc986ba",
+    "name": "判断",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 29
+  },
+  {
+    "id": "qt-9fd1b7cb41cf",
+    "name": "单选",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 24
+  },
+  {
+    "id": "qt-3e3aee801f41",
+    "name": "填空",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 24
+  },
+  {
+    "id": "qt-1c90cf8a9843",
+    "name": "案例分析",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 15
+  },
+  {
+    "id": "qt-cce830e395f6",
+    "name": "情景任务",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 8
+  },
+  {
+    "id": "qt-d167fc144d8c",
+    "name": "挑战任务",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 7
+  },
+  {
+    "id": "qt-5d80b0f2d806",
+    "name": "技术主观题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 5
+  },
+  {
+    "id": "qt-f484e5ab48b8",
+    "name": "情境决策题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-da58cb0ca02a",
+    "name": "方案设计题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-2d54cb0248d3",
+    "name": "案例分析题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-2c9e1adcd420",
+    "name": "短答建构题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-63b8a0c0019a",
+    "name": "解释理由题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-6b0b5e4695bb",
+    "name": "过程说明题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  },
+  {
+    "id": "qt-638eea26d583",
+    "name": "项目任务题",
+    "description": "",
+    "sourceSheet": "AI Literacy Question Bank Design.xlsx",
+    "exampleCount": 1
+  }
+]

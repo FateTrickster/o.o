@@ -49,12 +49,12 @@ def build_draft_prompt(
     return "\n\n".join(
         [
             "你是 AI 素养测评题库出题助手。",
-            "请基于给定知识条目生成场景化单选题草稿。",
+            "请基于给定知识条目生成场景化题目草稿。若未明确题型，默认生成单选题。",
             f"出题要求：{request.requirement or '无'}",
             "结构化出题目标：\n" + _target_text(request),
             f"题目数量：{count}",
-            "每题需要包含题干、场景、4 个选项、正确答案、解析、维度、能力、认知层级、难度、标签和来源。",
-            "请为每道题同时给出 dimension（一级维度）、secondaryDimension（二级维度）和 subSkill（二级能力），不要把二级维度和二级能力混为同一字段。",
+            "每题需要包含题型、题干、场景、选项或作答任务、正确答案/参考答案、解析、维度、能力、认知层级、难度、标签、知识点和来源。",
+            "请为每道题同时给出 questionType（题型）、dimension（一级维度）、secondaryDimension（二级维度）、tertiaryDimension（三级维度）、quaternaryDimension（四级维度）、knowledgePoints（知识点数组）和 subSkill（二级能力），不要把二级维度和二级能力混为同一字段。",
             "UACE 框架维度如下，dimension 和 secondaryDimension 必须从这里逐字选择，且二级维度必须属于所选一级维度：\n"
             + format_framework_for_prompt(),
             "知识条目：",
@@ -79,9 +79,9 @@ def build_messages(request: GenerateDraftRequest, knowledge_entries: List[Knowle
 
 请严格输出 JSON object，格式为 {"questions":[...]}。
 questions 数组中每个元素字段如下：
-title, question, scenario, options, correctAnswer, explanation, dimension, secondaryDimension, subSkill, cognitiveLevel, difficultyEstimate, tags, sourceReference, status。
-options 必须是 4 个选项，id 使用 A/B/C/D。
-correctAnswer 必须是 A/B/C/D 之一。
+questionType, title, question, scenario, options, correctAnswer, explanation, dimension, secondaryDimension, tertiaryDimension, quaternaryDimension, subSkill, cognitiveLevel, difficultyEstimate, tags, knowledgePoints, sourceReference, status。
+单选、多选题的 options 使用 A/B/C/D；主观题如无标准选项，options 可给出 2-4 个作答要点占位。
+单选题 correctAnswer 必须是 A/B/C/D 之一；多选题可使用 ABC 这类组合；主观题可使用“参考答案”。
 cognitiveLevel 只能是 remember/understand/apply/analyze/evaluate/create。
 difficultyEstimate 只能是 easy/medium/hard。
 status 使用 draft。""",
