@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
 import { KnowledgeEntry } from "@/types/knowledge";
-import { GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
+import { GenerationBatch, GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
 import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus } from "@/types/question";
 
 const cognitiveOptions: CognitiveLevel[] = ["remember", "understand", "apply", "analyze", "evaluate", "create"];
@@ -49,6 +49,7 @@ function jobStatusText(status: string) {
   const map: Record<string, string> = {
     running: "生成中",
     completed: "已完成",
+    partial: "部分完成",
     failed: "失败"
   };
   return map[status] ?? status;
@@ -85,6 +86,7 @@ export default function DraftGeneratorPanel() {
   const [draftCount, setDraftCount] = useState(3);
   const [drafts, setDrafts] = useState<QuestionDraft[]>([]);
   const [generationJobs, setGenerationJobs] = useState<GenerationJob[]>([]);
+  const [generationBatches, setGenerationBatches] = useState<GenerationBatch[]>([]);
   const [tagsTextById, setTagsTextById] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -97,25 +99,28 @@ export default function DraftGeneratorPanel() {
     setError("");
 
     try {
-      const [knowledgeResponse, draftResponse, jobsResponse] = await Promise.all([
+      const [knowledgeResponse, draftResponse, jobsResponse, batchesResponse] = await Promise.all([
         fetch("/api/knowledge", { cache: "no-store" }),
         fetch("/api/drafts", { cache: "no-store" }),
-        fetch("/api/generation-jobs", { cache: "no-store" })
+        fetch("/api/generation-jobs", { cache: "no-store" }),
+        fetch("/api/generation-batches", { cache: "no-store" })
       ]);
 
-      if (!knowledgeResponse.ok || !draftResponse.ok || !jobsResponse.ok) {
+      if (!knowledgeResponse.ok || !draftResponse.ok || !jobsResponse.ok || !batchesResponse.ok) {
         throw new Error("数据加载失败");
       }
 
-      const [knowledgeData, draftData, jobsData] = (await Promise.all([
+      const [knowledgeData, draftData, jobsData, batchesData] = (await Promise.all([
         knowledgeResponse.json(),
         draftResponse.json(),
-        jobsResponse.json()
-      ])) as [KnowledgeEntry[], QuestionDraft[], GenerationJob[]];
+        jobsResponse.json(),
+        batchesResponse.json()
+      ])) as [KnowledgeEntry[], QuestionDraft[], GenerationJob[], GenerationBatch[]];
 
       setKnowledgeEntries(knowledgeData);
       setDrafts(draftData);
       setGenerationJobs(jobsData);
+      setGenerationBatches(batchesData);
       setTagsTextById(Object.fromEntries(draftData.map((draft) => [draft.id, draft.tags.join(", ")])));
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : "数据加载失败");
@@ -468,7 +473,7 @@ export default function DraftGeneratorPanel() {
         </form>
       </section>
 
-      <GenerationJobList jobs={generationJobs} loading={loading} />
+      <GenerationJobList jobs={generationJobs} batches={generationBatches} loading={loading} />
 
       <section className="panel draft-list">
         <div className="panel-header">
@@ -506,10 +511,22 @@ export default function DraftGeneratorPanel() {
 
 type GenerationJobListProps = {
   jobs: GenerationJob[];
+  batches: GenerationBatch[];
   loading: boolean;
 };
 
-function GenerationJobList({ jobs, loading }: GenerationJobListProps) {
+function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
+  const batchesByJob = useMemo(() => {
+    const grouped = new Map<string, GenerationBatch[]>();
+    batches.forEach((batch) => {
+      const current = grouped.get(batch.jobId) ?? [];
+      current.push(batch);
+      grouped.set(batch.jobId, current);
+    });
+    grouped.forEach((items) => items.sort((a, b) => a.batchIndex - b.batchIndex));
+    return grouped;
+  }, [batches]);
+
   return (
     <section className="panel generation-job-list">
       <div className="panel-header">
@@ -526,6 +543,10 @@ function GenerationJobList({ jobs, loading }: GenerationJobListProps) {
                 <span className="badge">{job.model}</span>
                 <span className="badge">目标 {job.count} 道</span>
                 <span className="badge">草稿 {job.draftCount} 道</span>
+                <span className="badge">
+                  批次 {job.completedBatchCount}/{job.batchCount}
+                </span>
+                {job.failedBatchCount > 0 ? <span className="badge job-status-failed">失败 {job.failedBatchCount}</span> : null}
               </div>
               <p>{job.requirement || "未填写额外出题要求"}</p>
               <div className="badge-row">
@@ -546,6 +567,19 @@ function GenerationJobList({ jobs, loading }: GenerationJobListProps) {
                 ))}
               </div>
               {job.error ? <p className="job-error">{job.error}</p> : null}
+              <div className="batch-list">
+                {(batchesByJob.get(job.id) ?? []).map((batch) => (
+                  <div className="batch-item" key={batch.id}>
+                    <span className={`badge job-status-${batch.status}`}>
+                      第 {batch.batchIndex} 批 · {jobStatusText(batch.status)}
+                    </span>
+                    <span className="muted">
+                      {batch.generatedCount}/{batch.plannedCount} 道 · {batch.model}
+                    </span>
+                    {batch.error ? <span className="batch-error">{batch.error}</span> : null}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="job-time">
               <span>{new Date(job.createdAt).toLocaleString()}</span>

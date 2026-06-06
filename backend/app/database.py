@@ -94,6 +94,21 @@ def init_db() -> Path:
               error TEXT
             );
 
+            CREATE TABLE IF NOT EXISTS generation_batches (
+              id TEXT PRIMARY KEY,
+              job_id TEXT NOT NULL,
+              batch_index INTEGER NOT NULL,
+              provider TEXT NOT NULL,
+              model TEXT NOT NULL,
+              planned_count INTEGER NOT NULL,
+              generated_count INTEGER NOT NULL DEFAULT 0,
+              status TEXT NOT NULL,
+              started_at TEXT NOT NULL,
+              completed_at TEXT,
+              error TEXT,
+              FOREIGN KEY (job_id) REFERENCES generation_jobs(id)
+            );
+
             CREATE TABLE IF NOT EXISTS question_drafts (
               id TEXT PRIMARY KEY,
               title TEXT NOT NULL,

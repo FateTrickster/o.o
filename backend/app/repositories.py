@@ -6,6 +6,7 @@ import uuid
 from .database import connect, from_json, now_iso, to_json
 from .framework import UACE_FRAMEWORK, normalize_framework_selection
 from .schemas import (
+    GenerationBatch,
     GenerationJob,
     KnowledgeEntry,
     KnowledgeInput,
@@ -91,6 +92,25 @@ def _row_to_generation_job(row: Dict) -> GenerationJob:
         completedAt=row["completed_at"],
         error=row["error"],
         draftCount=row["draft_count"] if "draft_count" in row else 0,
+        batchCount=row["batch_count"] if "batch_count" in row else 0,
+        completedBatchCount=row["completed_batch_count"] if "completed_batch_count" in row else 0,
+        failedBatchCount=row["failed_batch_count"] if "failed_batch_count" in row else 0,
+    )
+
+
+def _row_to_generation_batch(row: Dict) -> GenerationBatch:
+    return GenerationBatch(
+        id=row["id"],
+        jobId=row["job_id"],
+        batchIndex=row["batch_index"],
+        provider=row["provider"],
+        model=row["model"],
+        plannedCount=row["planned_count"],
+        generatedCount=row["generated_count"],
+        status=row["status"],
+        startedAt=row["started_at"],
+        completedAt=row["completed_at"],
+        error=row["error"],
     )
 
 
@@ -266,15 +286,92 @@ def complete_generation_job(job_id: str, status: str, error: Optional[str] = Non
         )
 
 
+def create_generation_batch(
+    job_id: str,
+    batch_index: int,
+    provider: str,
+    model: str,
+    planned_count: int,
+) -> GenerationBatch:
+    batch = GenerationBatch(
+        id=str(uuid.uuid4()),
+        jobId=job_id,
+        batchIndex=batch_index,
+        provider=provider,
+        model=model,
+        plannedCount=planned_count,
+        generatedCount=0,
+        status="running",
+        startedAt=now_iso(),
+    )
+    with connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO generation_batches
+            (id, job_id, batch_index, provider, model, planned_count,
+             generated_count, status, started_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                batch.id,
+                batch.jobId,
+                batch.batchIndex,
+                batch.provider,
+                batch.model,
+                batch.plannedCount,
+                batch.generatedCount,
+                batch.status,
+                batch.startedAt,
+            ),
+        )
+    return batch
+
+
+def complete_generation_batch(
+    batch_id: str,
+    status: str,
+    generated_count: int = 0,
+    error: Optional[str] = None,
+) -> None:
+    with connect() as connection:
+        connection.execute(
+            """
+            UPDATE generation_batches
+            SET status = ?, generated_count = ?, completed_at = ?, error = ?
+            WHERE id = ?
+            """,
+            (status, generated_count, now_iso(), error, batch_id),
+        )
+
+
+def list_generation_batches(job_id: Optional[str] = None) -> List[GenerationBatch]:
+    query = "SELECT * FROM generation_batches"
+    params: List[str] = []
+    if job_id:
+        query += " WHERE job_id = ?"
+        params.append(job_id)
+    query += " ORDER BY started_at DESC, batch_index DESC LIMIT 200"
+    with connect() as connection:
+        rows = connection.execute(query, params).fetchall()
+        return [_row_to_generation_batch(dict(row)) for row in rows]
+
+
 def list_generation_jobs() -> List[GenerationJob]:
     with connect() as connection:
         rows = connection.execute(
             """
             SELECT generation_jobs.*,
-                   COUNT(question_drafts.id) AS draft_count
+                   COUNT(DISTINCT question_drafts.id) AS draft_count,
+                   COUNT(DISTINCT generation_batches.id) AS batch_count,
+                   COUNT(DISTINCT CASE WHEN generation_batches.status = 'completed' THEN generation_batches.id END)
+                     AS completed_batch_count,
+                   COUNT(DISTINCT CASE WHEN generation_batches.status = 'failed' THEN generation_batches.id END)
+                     AS failed_batch_count
             FROM generation_jobs
             LEFT JOIN question_drafts
               ON question_drafts.generation_job_id = generation_jobs.id
+            LEFT JOIN generation_batches
+              ON generation_batches.job_id = generation_jobs.id
             GROUP BY generation_jobs.id
             ORDER BY generation_jobs.created_at DESC
             LIMIT 50

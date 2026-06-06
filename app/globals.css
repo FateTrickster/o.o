@@ -567,12 +567,33 @@ textarea {
   color: var(--danger);
 }
 
+.batch-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.batch-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.batch-error {
+  color: var(--danger);
+  font-size: 12px;
+}
+
 .badge.job-status-running {
   background: #e8f3ff;
   color: #175cd3;
 }
 
-.badge.job-status-completed {
+.badge.job-status-completed,
+.badge.job-status-partial {
   background: #dff3e7;
   color: var(--success);
 }

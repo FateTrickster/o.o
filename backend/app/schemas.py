@@ -84,6 +84,23 @@ class GenerationJob(BaseModel):
     completedAt: Optional[str] = None
     error: Optional[str] = None
     draftCount: int = 0
+    batchCount: int = 0
+    completedBatchCount: int = 0
+    failedBatchCount: int = 0
+
+
+class GenerationBatch(BaseModel):
+    id: str
+    jobId: str
+    batchIndex: int
+    provider: str
+    model: str
+    plannedCount: int
+    generatedCount: int = 0
+    status: str
+    startedAt: str
+    completedAt: Optional[str] = None
+    error: Optional[str] = None
 
 
 class ImportJsonRequest(BaseModel):

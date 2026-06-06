@@ -5,13 +5,31 @@ from .database import init_db
 from .llm_client import generate_with_xfyun
 from .prompt_builder import build_generation_requirement
 from .repositories import (
+    complete_generation_batch,
     complete_generation_job,
+    create_generation_batch,
     create_drafts,
     create_generation_job,
     get_knowledge,
     seed_framework,
 )
 from .schemas import GenerateDraftRequest, KnowledgeEntry, QuestionDraft
+
+
+BATCH_SIZE = 3
+
+
+def _copy_request_with_count(request: GenerateDraftRequest, count: int) -> GenerateDraftRequest:
+    return GenerateDraftRequest(
+        knowledgeIds=request.knowledgeIds,
+        requirement=request.requirement,
+        targetDimensions=request.targetDimensions,
+        targetSecondaryDimensions=request.targetSecondaryDimensions,
+        targetTags=request.targetTags,
+        count=count,
+        provider=request.provider,
+        model=request.model,
+    )
 
 
 async def generate_drafts(request: GenerateDraftRequest) -> List[QuestionDraft]:
@@ -42,16 +60,45 @@ async def generate_drafts(request: GenerateDraftRequest) -> List[QuestionDraft]:
         count=request.count,
     )
 
-    try:
-        questions = await generate_with_xfyun(request, knowledge_entries)
-        drafts = create_drafts(
-            questions=questions[: request.count],
-            source_knowledge_ids=request.knowledgeIds,
-            generation_requirement=build_generation_requirement(request),
-            generation_job_id=job.id,
+    drafts: List[QuestionDraft] = []
+    errors: List[str] = []
+    remaining = request.count
+    batch_index = 1
+
+    while remaining > 0:
+        planned_count = min(BATCH_SIZE, remaining)
+        batch = create_generation_batch(
+            job_id=job.id,
+            batch_index=batch_index,
+            provider=provider,
+            model=model,
+            planned_count=planned_count,
         )
-        complete_generation_job(job.id, "completed")
+        batch_request = _copy_request_with_count(request, planned_count)
+
+        try:
+            questions = await generate_with_xfyun(batch_request, knowledge_entries)
+            batch_drafts = create_drafts(
+                questions=questions[:planned_count],
+                source_knowledge_ids=request.knowledgeIds,
+                generation_requirement=build_generation_requirement(batch_request),
+                generation_job_id=job.id,
+            )
+            drafts.extend(batch_drafts)
+            complete_generation_batch(batch.id, "completed", len(batch_drafts))
+        except Exception as exc:
+            message = str(exc) or exc.__class__.__name__
+            errors.append(f"Batch {batch_index}: {message}")
+            complete_generation_batch(batch.id, "failed", 0, message)
+
+        remaining -= planned_count
+        batch_index += 1
+
+    if drafts:
+        status = "completed" if not errors else "partial"
+        complete_generation_job(job.id, status, "\n".join(errors) if errors else None)
         return drafts
-    except Exception as exc:
-        complete_generation_job(job.id, "failed", str(exc) or exc.__class__.__name__)
-        raise
+
+    error_message = "\n".join(errors) or "No drafts were generated"
+    complete_generation_job(job.id, "failed", error_message)
+    raise RuntimeError(error_message)

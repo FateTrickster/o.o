@@ -8,6 +8,7 @@ from .framework import UACE_FRAMEWORK
 from .pipeline import generate_drafts as run_generate_drafts
 from .repositories import (
     accept_draft,
+    list_generation_batches,
     create_knowledge,
     create_knowledge_many,
     create_question,
@@ -30,6 +31,7 @@ from .repositories import (
 )
 from .schemas import (
     GenerateDraftRequest,
+    GenerationBatch,
     GenerationJob,
     ImportKnowledgeResult,
     ImportJsonRequest,
@@ -152,6 +154,11 @@ def get_drafts():
 @app.get("/generation-jobs", response_model=List[GenerationJob])
 def get_generation_jobs():
     return list_generation_jobs()
+
+
+@app.get("/generation-batches", response_model=List[GenerationBatch])
+def get_generation_batches(jobId: Optional[str] = None):
+    return list_generation_batches(jobId)
 
 
 @app.get("/drafts/{draft_id}", response_model=QuestionDraft)

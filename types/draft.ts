@@ -34,4 +34,21 @@ export interface GenerationJob {
   completedAt?: string | null;
   error?: string | null;
   draftCount: number;
+  batchCount: number;
+  completedBatchCount: number;
+  failedBatchCount: number;
+}
+
+export interface GenerationBatch {
+  id: string;
+  jobId: string;
+  batchIndex: number;
+  provider: string;
+  model: string;
+  plannedCount: number;
+  generatedCount: number;
+  status: "running" | "completed" | "failed" | string;
+  startedAt: string;
+  completedAt?: string | null;
+  error?: string | null;
 }
