@@ -53,5 +53,5 @@ async def generate_drafts(request: GenerateDraftRequest) -> List[QuestionDraft]:
         complete_generation_job(job.id, "completed")
         return drafts
     except Exception as exc:
-        complete_generation_job(job.id, "failed", str(exc))
+        complete_generation_job(job.id, "failed", str(exc) or exc.__class__.__name__)
         raise

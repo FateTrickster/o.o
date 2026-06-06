@@ -423,7 +423,8 @@ textarea {
 }
 
 .draft-generator,
-.draft-list {
+.draft-list,
+.generation-job-list {
   margin-bottom: 16px;
 }
 
@@ -534,6 +535,53 @@ textarea {
   margin: 6px 0 0;
 }
 
+.job-list {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.job-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.job-item-main p {
+  margin: 8px 0 0;
+}
+
+.job-time {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.job-error {
+  color: var(--danger);
+}
+
+.badge.job-status-running {
+  background: #e8f3ff;
+  color: #175cd3;
+}
+
+.badge.job-status-completed {
+  background: #dff3e7;
+  color: var(--success);
+}
+
+.badge.job-status-failed {
+  background: #fff1f0;
+  color: var(--danger);
+}
+
 @media (max-width: 1080px) {
   .layout-grid {
     grid-template-columns: 1fr;
@@ -558,8 +606,13 @@ textarea {
   }
 
   .form-grid,
-  .option-editor {
+  .option-editor,
+  .job-item {
     grid-template-columns: 1fr;
+  }
+
+  .job-time {
+    text-align: left;
   }
 
   .question-table {

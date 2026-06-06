@@ -59,6 +59,8 @@ npm run lint
 - 搜索编号、标题、题干和场景
 - 导出全部题库为 JSON
 - 从 JSON 批量导入题目
+- 选择知识条目生成题目草稿
+- 记录每次生成任务的模型、数量、状态和失败原因
 
 ## 题目字段
 
@@ -140,6 +142,8 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
 The app calls the OpenAI Responses API and asks the model to return structured JSON drafts. Drafts still receive no `itemCode`; `itemCode` is assigned only after a draft is accepted into the formal question bank.
+
+The draft generator now records each generation run in SQLite. The draft page shows recent generation jobs, requested item count, provider/model, status, remaining draft count, and error message when a run fails.
 
 ### Provider notes while framework is being finalized
 

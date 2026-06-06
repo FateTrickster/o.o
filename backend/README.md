@@ -8,6 +8,7 @@ It is now the runtime data source for the Next.js UI. The Next `/api/*` routes p
 - seed the UACE framework
 - import existing `data/knowledge.json`, `data/drafts.json`, and `data/questions.json`
 - call Xfyun MaaS to generate question drafts
+- track each draft generation run in `generation_jobs`
 - store generated drafts in SQLite
 - list, view, create, edit, and delete knowledge entries
 - list, edit, delete, and accept generated drafts
@@ -80,6 +81,7 @@ GET    /knowledge/{entry_id}
 PUT    /knowledge/{entry_id}
 DELETE /knowledge/{entry_id}
 GET    /drafts
+GET    /generation-jobs
 GET    /drafts/{draft_id}
 PUT    /drafts/{draft_id}
 DELETE /drafts/{draft_id}

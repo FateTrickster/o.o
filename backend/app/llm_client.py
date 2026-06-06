@@ -70,23 +70,35 @@ async def generate_with_xfyun(
     api_key = get_xfyun_api_key()
     base_url = get_xfyun_base_url()
     model = request.model or get_xfyun_model()
+    timeout_seconds = max(90, min(240, 45 + request.count * 15))
     payload = {
         "model": model,
         "messages": build_messages(request, knowledge_entries),
         "temperature": 0.4,
     }
 
-    async with httpx.AsyncClient(timeout=90, trust_env=False) as client:
-        response = await client.post(
-            f"{base_url}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-        )
+    try:
+        async with httpx.AsyncClient(timeout=timeout_seconds, trust_env=False) as client:
+            response = await client.post(
+                f"{base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+    except httpx.TimeoutException as exc:
+        raise RuntimeError(
+            f"Xfyun MaaS request timed out after {timeout_seconds} seconds. "
+            "Try generating fewer questions per batch or narrowing the selected dimensions."
+        ) from exc
+    except httpx.RequestError as exc:
+        raise RuntimeError(f"Xfyun MaaS network request failed: {exc}") from exc
 
-    result = response.json()
+    try:
+        result = response.json()
+    except ValueError as exc:
+        raise RuntimeError("Xfyun MaaS response was not valid JSON") from exc
     if response.status_code >= 400:
         message = result.get("error", {}).get("message") if isinstance(result, dict) else ""
         raise RuntimeError(message or f"Xfyun MaaS request failed with {response.status_code}")

@@ -65,7 +65,7 @@ class GenerateDraftRequest(BaseModel):
     targetDimensions: List[str] = Field(default_factory=list)
     targetSecondaryDimensions: List[str] = Field(default_factory=list)
     targetTags: List[str] = Field(default_factory=list)
-    count: int = 3
+    count: int = Field(default=3, ge=1, le=20)
     provider: Optional[str] = None
     model: Optional[str] = None
 
@@ -83,6 +83,7 @@ class GenerationJob(BaseModel):
     createdAt: str
     completedAt: Optional[str] = None
     error: Optional[str] = None
+    draftCount: int = 0
 
 
 class ImportJsonRequest(BaseModel):

@@ -20,6 +20,7 @@ from .repositories import (
     get_question,
     import_questions,
     list_drafts,
+    list_generation_jobs,
     list_knowledge,
     list_questions,
     seed_framework,
@@ -29,6 +30,7 @@ from .repositories import (
 )
 from .schemas import (
     GenerateDraftRequest,
+    GenerationJob,
     ImportKnowledgeResult,
     ImportJsonRequest,
     ImportQuestionsResult,
@@ -145,6 +147,11 @@ def delete_knowledge_entry(entry_id: str):
 @app.get("/drafts", response_model=List[QuestionDraft])
 def get_drafts():
     return list_drafts()
+
+
+@app.get("/generation-jobs", response_model=List[GenerationJob])
+def get_generation_jobs():
+    return list_generation_jobs()
 
 
 @app.get("/drafts/{draft_id}", response_model=QuestionDraft)

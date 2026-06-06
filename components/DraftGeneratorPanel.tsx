@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
 import { KnowledgeEntry } from "@/types/knowledge";
-import { QuestionDraft, QuestionDraftInput } from "@/types/draft";
+import { GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
 import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus } from "@/types/question";
 
 const cognitiveOptions: CognitiveLevel[] = ["remember", "understand", "apply", "analyze", "evaluate", "create"];
@@ -45,6 +45,15 @@ function statusText(status: QuestionStatus) {
   return map[status];
 }
 
+function jobStatusText(status: string) {
+  const map: Record<string, string> = {
+    running: "生成中",
+    completed: "已完成",
+    failed: "失败"
+  };
+  return map[status] ?? status;
+}
+
 function toDraftInput(draft: QuestionDraft): QuestionDraftInput {
   return {
     title: draft.title,
@@ -73,7 +82,9 @@ export default function DraftGeneratorPanel() {
   const [selectedSecondaryDimensions, setSelectedSecondaryDimensions] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [requirement, setRequirement] = useState("");
+  const [draftCount, setDraftCount] = useState(3);
   const [drafts, setDrafts] = useState<QuestionDraft[]>([]);
+  const [generationJobs, setGenerationJobs] = useState<GenerationJob[]>([]);
   const [tagsTextById, setTagsTextById] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -86,22 +97,25 @@ export default function DraftGeneratorPanel() {
     setError("");
 
     try {
-      const [knowledgeResponse, draftResponse] = await Promise.all([
+      const [knowledgeResponse, draftResponse, jobsResponse] = await Promise.all([
         fetch("/api/knowledge", { cache: "no-store" }),
-        fetch("/api/drafts", { cache: "no-store" })
+        fetch("/api/drafts", { cache: "no-store" }),
+        fetch("/api/generation-jobs", { cache: "no-store" })
       ]);
 
-      if (!knowledgeResponse.ok || !draftResponse.ok) {
+      if (!knowledgeResponse.ok || !draftResponse.ok || !jobsResponse.ok) {
         throw new Error("数据加载失败");
       }
 
-      const [knowledgeData, draftData] = (await Promise.all([
+      const [knowledgeData, draftData, jobsData] = (await Promise.all([
         knowledgeResponse.json(),
-        draftResponse.json()
-      ])) as [KnowledgeEntry[], QuestionDraft[]];
+        draftResponse.json(),
+        jobsResponse.json()
+      ])) as [KnowledgeEntry[], QuestionDraft[], GenerationJob[]];
 
       setKnowledgeEntries(knowledgeData);
       setDrafts(draftData);
+      setGenerationJobs(jobsData);
       setTagsTextById(Object.fromEntries(draftData.map((draft) => [draft.id, draft.tags.join(", ")])));
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : "数据加载失败");
@@ -159,6 +173,9 @@ export default function DraftGeneratorPanel() {
     setError("");
     setStatusMessage("");
 
+    const safeCount = Math.max(1, Math.min(20, Math.floor(draftCount || 1)));
+    setDraftCount(safeCount);
+
     try {
       const response = await fetch("/api/drafts/generate", {
         method: "POST",
@@ -168,7 +185,8 @@ export default function DraftGeneratorPanel() {
           requirement,
           targetDimensions: selectedDimensions,
           targetSecondaryDimensions: selectedSecondaryDimensions,
-          targetTags: selectedTags
+          targetTags: selectedTags,
+          count: safeCount
         })
       });
       const result = (await response.json()) as QuestionDraft[] | { error?: string };
@@ -432,6 +450,16 @@ export default function DraftGeneratorPanel() {
               placeholder="例如：生成 3 道场景化单选题，偏应用层级，聚焦隐私风险和结果核验。"
             />
           </label>
+          <label className="form-row">
+            <span>生成数量</span>
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={draftCount}
+              onChange={(event) => setDraftCount(Number(event.target.value))}
+            />
+          </label>
           <div className="toolbar" style={{ marginTop: 14 }}>
             <button className="primary" type="submit" disabled={generating || selectedKnowledgeIds.length === 0}>
               {generating ? "生成中..." : "生成题目草稿"}
@@ -439,6 +467,8 @@ export default function DraftGeneratorPanel() {
           </div>
         </form>
       </section>
+
+      <GenerationJobList jobs={generationJobs} loading={loading} />
 
       <section className="panel draft-list">
         <div className="panel-header">
@@ -471,6 +501,61 @@ export default function DraftGeneratorPanel() {
         </div>
       </section>
     </>
+  );
+}
+
+type GenerationJobListProps = {
+  jobs: GenerationJob[];
+  loading: boolean;
+};
+
+function GenerationJobList({ jobs, loading }: GenerationJobListProps) {
+  return (
+    <section className="panel generation-job-list">
+      <div className="panel-header">
+        <h2>生成任务记录</h2>
+        <span className="muted">{loading ? "加载中..." : `${jobs.length} 次任务`}</span>
+      </div>
+      <div className="job-list">
+        {jobs.map((job) => (
+          <article className="job-item" key={job.id}>
+            <div className="job-item-main">
+              <div className="badge-row">
+                <span className={`badge job-status-${job.status}`}>{jobStatusText(job.status)}</span>
+                <span className="badge">{job.provider}</span>
+                <span className="badge">{job.model}</span>
+                <span className="badge">目标 {job.count} 道</span>
+                <span className="badge">草稿 {job.draftCount} 道</span>
+              </div>
+              <p>{job.requirement || "未填写额外出题要求"}</p>
+              <div className="badge-row">
+                {job.targetDimensions.map((dimension) => (
+                  <span className="badge" key={dimension}>
+                    {dimension}
+                  </span>
+                ))}
+                {job.targetSecondaryDimensions.map((dimension) => (
+                  <span className="badge" key={dimension}>
+                    {dimension}
+                  </span>
+                ))}
+                {job.targetTags.map((tag) => (
+                  <span className="badge" key={tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {job.error ? <p className="job-error">{job.error}</p> : null}
+            </div>
+            <div className="job-time">
+              <span>{new Date(job.createdAt).toLocaleString()}</span>
+              {job.completedAt ? <span>{new Date(job.completedAt).toLocaleString()}</span> : null}
+            </div>
+          </article>
+        ))}
+        {!loading && jobs.length === 0 ? <div className="empty-state">暂无生成任务记录。</div> : null}
+      </div>
+    </section>
   );
 }
 

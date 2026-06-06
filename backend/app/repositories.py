@@ -76,6 +76,24 @@ def _row_to_question(row: Dict) -> Question:
     )
 
 
+def _row_to_generation_job(row: Dict) -> GenerationJob:
+    return GenerationJob(
+        id=row["id"],
+        provider=row["provider"],
+        model=row["model"],
+        requirement=row["requirement"] or "",
+        targetDimensions=from_json(row["target_dimensions_json"], []),
+        targetSecondaryDimensions=from_json(row["target_secondary_dimensions_json"], []),
+        targetTags=from_json(row["target_tags_json"], []),
+        count=row["count"],
+        status=row["status"],
+        createdAt=row["created_at"],
+        completedAt=row["completed_at"],
+        error=row["error"],
+        draftCount=row["draft_count"] if "draft_count" in row else 0,
+    )
+
+
 def seed_framework() -> None:
     with connect() as connection:
         for item in UACE_FRAMEWORK:
@@ -152,7 +170,16 @@ def create_knowledge(input_data: KnowledgeInput) -> KnowledgeEntry:
 
 
 def create_knowledge_many(inputs: List[KnowledgeInput]) -> Dict[str, int]:
-    created = [KnowledgeEntry(**input_data.dict(), id=str(uuid.uuid4()), createdAt=now_iso(), updatedAt=now_iso()) for input_data in inputs]
+    now = now_iso()
+    created = [
+        KnowledgeEntry(
+            **input_data.dict(),
+            id=str(uuid.uuid4()),
+            createdAt=now,
+            updatedAt=now,
+        )
+        for input_data in inputs
+    ]
     with connect() as connection:
         for entry in created:
             _insert_or_replace_knowledge(connection, entry)
@@ -237,6 +264,23 @@ def complete_generation_job(job_id: str, status: str, error: Optional[str] = Non
             """,
             (status, now_iso(), error, job_id),
         )
+
+
+def list_generation_jobs() -> List[GenerationJob]:
+    with connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT generation_jobs.*,
+                   COUNT(question_drafts.id) AS draft_count
+            FROM generation_jobs
+            LEFT JOIN question_drafts
+              ON question_drafts.generation_job_id = generation_jobs.id
+            GROUP BY generation_jobs.id
+            ORDER BY generation_jobs.created_at DESC
+            LIMIT 50
+            """
+        ).fetchall()
+        return [_row_to_generation_job(dict(row)) for row in rows]
 
 
 def list_drafts() -> List[QuestionDraft]:
