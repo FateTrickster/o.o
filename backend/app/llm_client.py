@@ -7,7 +7,7 @@ import httpx
 from .config import get_xfyun_api_key, get_xfyun_base_url, get_xfyun_model
 from .framework import normalize_framework_selection
 from .prompt_builder import build_messages
-from .schemas import GenerateDraftRequest, KnowledgeEntry, QuestionInput
+from .schemas import GenerateDraftRequest, KnowledgeEntry, QuestionInput, QuestionOption
 
 
 def _strip_code_fence(content: str) -> str:
@@ -25,13 +25,57 @@ def _extract_json(content: str) -> Dict[str, Any]:
         start = cleaned.find("{")
         end = cleaned.rfind("}")
         if start >= 0 and end > start:
-            return json.loads(cleaned[start : end + 1])
-        raise
+            try:
+                return json.loads(cleaned[start : end + 1])
+            except json.JSONDecodeError as exc:
+                preview = cleaned[:500].replace("\n", "\\n")
+                raise ValueError(f"Model response was not valid JSON: {exc}. Preview: {preview}") from exc
+        preview = cleaned[:500].replace("\n", "\\n")
+        raise ValueError(f"Model response did not contain a JSON object. Preview: {preview}")
+
+
+def _normalize_options(raw_options: Any) -> List[QuestionOption]:
+    if isinstance(raw_options, dict):
+        return [
+            QuestionOption(id=str(key).strip(), text=str(value).strip())
+            for key, value in raw_options.items()
+            if str(key).strip() and str(value).strip()
+        ]
+
+    if isinstance(raw_options, list):
+        options: List[QuestionOption] = []
+        for index, option in enumerate(raw_options):
+            default_id = chr(65 + index)
+            if isinstance(option, dict):
+                option_id = str(option.get("id") or option.get("key") or option.get("label") or default_id).strip()
+                text = str(option.get("text") or option.get("content") or option.get("value") or "").strip()
+            else:
+                option_id = default_id
+                text = str(option).strip()
+            if option_id and text:
+                options.append(QuestionOption(id=option_id, text=text))
+        return options
+
+    return []
+
+
+def _normalize_string_list(value: Any) -> List[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, str):
+        return [item.strip() for item in re.split(r"[,，、;；\n]", value) if item.strip()]
+    return []
+
+
+def _normalize_answer(value: Any) -> str:
+    if isinstance(value, list):
+        return "".join(str(item).strip() for item in value if str(item).strip())
+    return str(value or "").strip()
 
 
 def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
-    tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
-    knowledge_points = raw.get("knowledgePoints") if isinstance(raw.get("knowledgePoints"), list) else []
+    tags = _normalize_string_list(raw.get("tags"))
+    knowledge_points = _normalize_string_list(raw.get("knowledgePoints"))
     selection = normalize_framework_selection(
         raw.get("dimension", ""),
         raw.get("secondaryDimension", ""),
@@ -52,8 +96,8 @@ def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
         title=str(raw.get("title", "")).strip(),
         question=str(raw.get("question", "")).strip(),
         scenario=str(raw.get("scenario", "")).strip(),
-        options=raw.get("options") or [],
-        correctAnswer=str(raw.get("correctAnswer", "")).strip(),
+        options=_normalize_options(raw.get("options")),
+        correctAnswer=_normalize_answer(raw.get("correctAnswer")),
         explanation=str(raw.get("explanation", "")).strip(),
         dimension=raw["dimension"],
         secondaryDimension=raw["secondaryDimension"],
@@ -62,8 +106,8 @@ def _normalize_question(raw: Dict[str, Any]) -> QuestionInput:
         subSkill=str(raw.get("subSkill", "")).strip() or raw["secondaryDimension"],
         cognitiveLevel=str(raw.get("cognitiveLevel", "apply")).strip(),
         difficultyEstimate=str(raw.get("difficultyEstimate", "medium")).strip(),
-        tags=[str(tag).strip() for tag in tags if str(tag).strip()],
-        knowledgePoints=[str(point).strip() for point in knowledge_points if str(point).strip()],
+        tags=tags,
+        knowledgePoints=knowledge_points,
         sourceReference=str(raw.get("sourceReference", "")).strip(),
         status=str(raw.get("status", "draft")).strip() or "draft",
     )

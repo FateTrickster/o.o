@@ -68,6 +68,40 @@ POST /drafts/generate
 }
 ```
 
+## Generate Drafts From IDE Terminal
+
+Run a dry run first. This only prints the plan and does not call the API:
+
+```bash
+python -m backend.app.scripts.generate_drafts --per-knowledge 3 --max-knowledge 5 --dry-run
+```
+
+Generate drafts after the plan looks right:
+
+```bash
+python -m backend.app.scripts.generate_drafts --per-knowledge 3 --max-knowledge 5
+```
+
+Useful options:
+
+```bash
+python -m backend.app.scripts.generate_drafts ^
+  --per-knowledge 3 ^
+  --max-knowledge 20 ^
+  --dimension "理解AI（Understand）" ^
+  --secondary-dimension "知道人工智能的基本概念（如机器学习、生成式AI等）" ^
+  --tag "机器学习" ^
+  --requirement "生成初中 AI 素养场景化单选题，选项要有区分度。" ^
+  --pause-seconds 2
+```
+
+Notes:
+
+- `--per-knowledge` is limited to 1-20 because one backend request is capped at 20.
+- `--tag` can be repeated or comma-separated. It filters knowledge entries and is also passed into the generation prompt as target tags.
+- Generated questions are saved as drafts in `question_drafts`; they are not formal questions until accepted.
+- Open `backend/data/ai_literacy.db` in Navicat and refresh/reconnect to inspect the SQLite tables.
+
 ## Core Endpoints
 
 ```text

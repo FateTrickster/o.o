@@ -80,6 +80,7 @@ def build_messages(request: GenerateDraftRequest, knowledge_entries: List[Knowle
 请严格输出 JSON object，格式为 {"questions":[...]}。
 questions 数组中每个元素字段如下：
 questionType, title, question, scenario, options, correctAnswer, explanation, dimension, secondaryDimension, tertiaryDimension, quaternaryDimension, subSkill, cognitiveLevel, difficultyEstimate, tags, knowledgePoints, sourceReference, status。
+options 必须是数组，不要输出对象。正确格式是 [{"id":"A","text":"选项内容"},{"id":"B","text":"选项内容"}]，不要输出 {"A":"选项内容","B":"选项内容"}。
 单选、多选题的 options 使用 A/B/C/D；主观题如无标准选项，options 可给出 2-4 个作答要点占位。
 单选题 correctAnswer 必须是 A/B/C/D 之一；多选题可使用 ABC 这类组合；主观题可使用“参考答案”。
 cognitiveLevel 只能是 remember/understand/apply/analyze/evaluate/create。
