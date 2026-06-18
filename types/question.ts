@@ -54,6 +54,19 @@ export interface Question {
   knowledgePoints?: string[];
   sourceReference: string;
   status: QuestionStatus;
+  stage?: string;
+  knowledgeCode?: string;
+  primaryDimension?: string;
+  tertiaryAbility?: string;
+  knowledgePoint?: string;
+  questionTask?: string;
+  referenceAnswer?: string;
+  scoringCriteria?: string;
+  form?: string;
+  scoreMax?: number | null;
+  discrimination?: number | null;
+  sourceSheet?: string;
+  sourceRow?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,4 +80,24 @@ export interface QuestionFilters {
   difficulty?: DifficultyEstimate | "";
   tag?: string;
   search?: string;
+}
+
+export interface KnowledgePoint {
+  id: string;
+  knowledgeCode: string;
+  stage: string;
+  primaryDimension: string;
+  secondaryDimension: string;
+  tertiaryAbility: string;
+  knowledgePoint: string;
+  description: string;
+  cognitiveLevel: string;
+  suggestedQuestionTypes: string[];
+  sourceReferences: string[];
+  tags: string[];
+  status: string;
+  sourceSheet: string;
+  sourceRow: number;
+  createdAt: string;
+  updatedAt: string;
 }

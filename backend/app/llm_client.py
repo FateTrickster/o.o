@@ -4,7 +4,14 @@ import re
 
 import httpx
 
-from .config import get_xfyun_api_key, get_xfyun_base_url, get_xfyun_model
+from .config import (
+    get_deepseek_api_key,
+    get_deepseek_base_url,
+    get_deepseek_model,
+    get_xfyun_api_key,
+    get_xfyun_base_url,
+    get_xfyun_model,
+)
 from .framework import normalize_framework_selection
 from .prompt_builder import build_messages
 from .schemas import GenerateDraftRequest, KnowledgeEntry, QuestionInput, QuestionOption
@@ -161,5 +168,58 @@ async def generate_with_xfyun(
     questions = parsed.get("questions")
     if not isinstance(questions, list):
         raise RuntimeError("Xfyun MaaS response must include a questions array")
+
+    return [_normalize_question(question) for question in questions]
+
+
+async def generate_with_deepseek(
+    request: GenerateDraftRequest,
+    knowledge_entries: List[KnowledgeEntry],
+) -> List[QuestionInput]:
+    api_key = get_deepseek_api_key()
+    base_url = get_deepseek_base_url()
+    model = request.model or get_deepseek_model()
+    timeout_seconds = max(90, min(240, 45 + request.count * 15))
+    payload = {
+        "model": model,
+        "messages": build_messages(request, knowledge_entries),
+        "temperature": 0.4,
+        "response_format": {"type": "json_object"},
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=timeout_seconds, trust_env=False) as client:
+            response = await client.post(
+                f"{base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+    except httpx.TimeoutException as exc:
+        raise RuntimeError(
+            f"DeepSeek request timed out after {timeout_seconds} seconds. "
+            "Try generating fewer questions per batch or narrowing the selected dimensions."
+        ) from exc
+    except httpx.RequestError as exc:
+        raise RuntimeError(f"DeepSeek network request failed: {exc}") from exc
+
+    try:
+        result = response.json()
+    except ValueError as exc:
+        raise RuntimeError("DeepSeek response was not valid JSON") from exc
+    if response.status_code >= 400:
+        message = result.get("error", {}).get("message") if isinstance(result, dict) else ""
+        raise RuntimeError(message or f"DeepSeek request failed with {response.status_code}")
+
+    content = result.get("choices", [{}])[0].get("message", {}).get("content")
+    if not content:
+        raise RuntimeError("DeepSeek response did not include content")
+
+    parsed = _extract_json(content)
+    questions = parsed.get("questions")
+    if not isinstance(questions, list):
+        raise RuntimeError("DeepSeek response must include a questions array")
 
     return [_normalize_question(question) for question in questions]

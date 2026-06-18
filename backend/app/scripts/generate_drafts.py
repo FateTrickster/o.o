@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from typing import Iterable, List, Sequence
 
-from backend.app.config import get_xfyun_model
+from backend.app.config import get_deepseek_model, get_xfyun_model
 from backend.app.database import init_db
 from backend.app.pipeline import generate_drafts
 from backend.app.repositories import list_knowledge, seed_framework
@@ -66,11 +66,17 @@ def _format_tags(tags: Sequence[str]) -> str:
     return ", ".join(tags) if tags else "-"
 
 
+def _default_model(provider: str) -> str:
+    if provider == "deepseek":
+        return get_deepseek_model()
+    return get_xfyun_model()
+
+
 def print_plan(plan: Sequence[GenerationPlanItem], args: argparse.Namespace, target_tags: Sequence[str]) -> None:
     total = sum(item.count for item in plan)
     print("Generation plan")
     print(f"- provider: {args.provider}")
-    print(f"- model: {args.model or get_xfyun_model()}")
+    print(f"- model: {args.model or _default_model(args.provider)}")
     print(f"- per knowledge: {args.per_knowledge}")
     print(f"- knowledge entries: {len(plan)}")
     print(f"- planned drafts: {total}")
@@ -171,12 +177,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--provider",
         default="xfyun",
-        help="LLM provider. The current Python pipeline supports xfyun.",
+        choices=["xfyun", "deepseek"],
+        help="LLM provider.",
     )
     parser.add_argument(
         "--model",
         default="",
-        help="Model id. Defaults to XFYUN_MAAS_MODEL from .env.local.",
+        help="Model id. Defaults to the selected provider's model setting from .env.local.",
     )
     parser.add_argument(
         "--pause-seconds",

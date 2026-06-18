@@ -9,6 +9,7 @@ from .pipeline import generate_drafts as run_generate_drafts
 from .repositories import (
     accept_draft,
     list_generation_batches,
+    list_knowledge_points,
     list_knowledge_taxonomy,
     list_question_type_examples,
     list_question_types,
@@ -41,6 +42,7 @@ from .schemas import (
     ImportQuestionsResult,
     KnowledgeEntry,
     KnowledgeInput,
+    KnowledgePoint,
     KnowledgeTaxonomyItem,
     Question,
     QuestionDraft,
@@ -108,6 +110,16 @@ def get_knowledge_taxonomy(
     secondaryDimension: Optional[str] = None,
 ):
     return list_knowledge_taxonomy(gradeLevel, primaryDimension, secondaryDimension)
+
+
+@app.get("/knowledge-points", response_model=List[KnowledgePoint])
+def get_knowledge_points(
+    stage: Optional[str] = None,
+    primaryDimension: Optional[str] = None,
+    secondaryDimension: Optional[str] = None,
+    search: Optional[str] = None,
+):
+    return list_knowledge_points(stage, primaryDimension, secondaryDimension, search)
 
 
 @app.get("/knowledge", response_model=List[KnowledgeEntry])

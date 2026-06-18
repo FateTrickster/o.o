@@ -26,6 +26,19 @@ class QuestionInput(BaseModel):
     knowledgePoints: List[str] = Field(default_factory=list)
     sourceReference: str
     status: str = "draft"
+    stage: str = ""
+    knowledgeCode: str = ""
+    primaryDimension: str = ""
+    tertiaryAbility: str = ""
+    knowledgePoint: str = ""
+    questionTask: str = ""
+    referenceAnswer: str = ""
+    scoringCriteria: str = ""
+    form: str = ""
+    scoreMax: Optional[float] = None
+    discrimination: Optional[float] = None
+    sourceSheet: str = ""
+    sourceRow: int = 0
 
 
 class Question(QuestionInput):
@@ -143,6 +156,26 @@ class KnowledgeTaxonomyItem(BaseModel):
     knowledgeDescription: str = ""
     sourceReference: str = ""
     note: str = ""
+    sourceSheet: str = ""
+    sourceRow: int = 0
+    createdAt: str
+    updatedAt: str
+
+
+class KnowledgePoint(BaseModel):
+    id: str
+    knowledgeCode: str
+    stage: str = ""
+    primaryDimension: str = ""
+    secondaryDimension: str = ""
+    tertiaryAbility: str = ""
+    knowledgePoint: str = ""
+    description: str = ""
+    cognitiveLevel: str = ""
+    suggestedQuestionTypes: List[str] = Field(default_factory=list)
+    sourceReferences: List[str] = Field(default_factory=list)
+    tags: List[str] = Field(default_factory=list)
+    status: str = "active"
     sourceSheet: str = ""
     sourceRow: int = 0
     createdAt: str

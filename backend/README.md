@@ -82,6 +82,16 @@ Generate drafts after the plan looks right:
 python -m backend.app.scripts.generate_drafts --per-knowledge 3 --max-knowledge 5
 ```
 
+Generate drafts with DeepSeek for comparison:
+
+```bash
+python -m backend.app.scripts.generate_drafts ^
+  --provider deepseek ^
+  --per-knowledge 2 ^
+  --max-knowledge 3 ^
+  --requirement "Generate junior-high AI literacy scenario-based single-choice questions."
+```
+
 Useful options:
 
 ```bash
@@ -101,6 +111,65 @@ Notes:
 - `--tag` can be repeated or comma-separated. It filters knowledge entries and is also passed into the generation prompt as target tags.
 - Generated questions are saved as drafts in `question_drafts`; they are not formal questions until accepted.
 - Open `backend/data/ai_literacy.db` in Navicat and refresh/reconnect to inspect the SQLite tables.
+
+## Import Completed Workbook Questions
+
+Import completed questions from `knowledge/AI素养题库设计.xlsx` into the formal `questions` table:
+
+```bash
+python -m backend.app.scripts.import_knowledge_points --dry-run
+python -m backend.app.scripts.import_knowledge_points
+python -m backend.app.scripts.import_workbook_questions --dry-run
+python -m backend.app.scripts.import_workbook_questions
+python -m backend.app.scripts.backfill_question_metadata
+```
+
+`import_knowledge_points` builds the normalized `knowledge_points` table from the workbook's knowledge sheets. The question importer reads the `理解AI`, `使用AI`, `创造AI`, and `AI伦理` sheets, assigns normal `itemCode` values, and uses stable IDs so rerunning the command updates the same imported questions instead of duplicating them. `backfill_question_metadata` fills the newer normalized columns on existing formal questions where possible.
+
+## Codex-Assisted Draft Generation
+
+Use this when Codex is helping generate higher-quality drafts in the current repo instead of calling an external LLM API directly.
+
+Step 1: export a knowledge-backed generation plan:
+
+```bash
+python -m backend.app.scripts.codex_draft_tool plan ^
+  --per-knowledge 2 ^
+  --max-knowledge 3 ^
+  --output data/codex_generation_plan.json
+```
+
+Give the generated `data/codex_generation_plan.json` to Codex in the current thread. Codex should return JSON matching the plan's `outputSchema`.
+
+Step 2: validate the generated JSON without writing to SQLite:
+
+```bash
+python -m backend.app.scripts.codex_draft_tool import ^
+  --input data/codex_generated_drafts.json ^
+  --dry-run
+```
+
+Step 3: import valid drafts into SQLite:
+
+```bash
+python -m backend.app.scripts.codex_draft_tool import ^
+  --input data/codex_generated_drafts.json ^
+  --requirement "Codex assisted draft generation from knowledge chunks"
+```
+
+This writes drafts into `question_drafts` and creates audit records in `generation_jobs` / `generation_batches` with `provider=codex`.
+
+## Small Provider Comparison
+
+A lightweight comparison can use the same knowledge scope and count:
+
+```bash
+python -m backend.app.scripts.generate_drafts --provider xfyun --per-knowledge 2 --max-knowledge 3
+python -m backend.app.scripts.generate_drafts --provider deepseek --per-knowledge 2 --max-knowledge 3
+python -m backend.app.scripts.codex_draft_tool plan --per-knowledge 2 --max-knowledge 3 --output data/codex_generation_plan.json
+```
+
+Use the generated plan for Codex-assisted questions, then import them with `codex_draft_tool import`. Compare the resulting drafts by `generation_jobs.provider`.
 
 ## Core Endpoints
 

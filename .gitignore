@@ -7,3 +7,10 @@ node_modules
 __pycache__/
 *.pyc
 backend/data/
+knowledge/
+outputs/
+data/*comparison*.json
+data/imported_workbook_questions.json
+data/knowledge_point_comparison_plan_*.json
+data/knowledge_point_model_comparison_rows*.json
+data/knowledge_points_import.json

@@ -1,8 +1,8 @@
 from typing import List
 
-from .config import get_xfyun_model
+from .config import get_deepseek_model, get_xfyun_model
 from .database import init_db
-from .llm_client import generate_with_xfyun
+from .llm_client import generate_with_deepseek, generate_with_xfyun
 from .prompt_builder import build_generation_requirement
 from .repositories import (
     complete_generation_batch,
@@ -46,10 +46,14 @@ async def generate_drafts(request: GenerateDraftRequest) -> List[QuestionDraft]:
         raise ValueError("No usable knowledge entries found")
 
     provider = request.provider or "xfyun"
-    if provider != "xfyun":
-        raise ValueError("The Python MVP currently supports provider='xfyun' only")
-
-    model = request.model or get_xfyun_model()
+    if provider == "xfyun":
+        model = request.model or get_xfyun_model()
+        generator = generate_with_xfyun
+    elif provider == "deepseek":
+        model = request.model or get_deepseek_model()
+        generator = generate_with_deepseek
+    else:
+        raise ValueError("The Python MVP currently supports provider='xfyun' or provider='deepseek'")
     job = create_generation_job(
         provider=provider,
         model=model,
@@ -77,7 +81,7 @@ async def generate_drafts(request: GenerateDraftRequest) -> List[QuestionDraft]:
         batch_request = _copy_request_with_count(request, planned_count)
 
         try:
-            questions = await generate_with_xfyun(batch_request, knowledge_entries)
+            questions = await generator(batch_request, knowledge_entries)
             batch_drafts = create_drafts(
                 questions=questions[:planned_count],
                 source_knowledge_ids=request.knowledgeIds,

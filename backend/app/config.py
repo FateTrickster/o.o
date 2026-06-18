@@ -50,3 +50,18 @@ def get_xfyun_base_url() -> str:
         get_setting("XFYUN_MAAS_BASE_URL", "https://maas-api.cn-huabei-1.xf-yun.com/v2")
         or "https://maas-api.cn-huabei-1.xf-yun.com/v2"
     ).rstrip("/")
+
+
+def get_deepseek_api_key() -> str:
+    value = get_setting("AI_LITERACY_DEEPSEEK_API_KEY") or get_setting("DEEPSEEK_API_KEY", "")
+    if not value:
+        raise RuntimeError("AI_LITERACY_DEEPSEEK_API_KEY or DEEPSEEK_API_KEY is not configured")
+    return value
+
+
+def get_deepseek_model() -> str:
+    return get_setting("DEEPSEEK_MODEL", "deepseek-chat") or "deepseek-chat"
+
+
+def get_deepseek_base_url() -> str:
+    return (get_setting("DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com").rstrip("/")

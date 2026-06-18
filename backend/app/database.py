@@ -203,9 +203,45 @@ def init_db() -> Path:
             );
             """
         )
+        connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS knowledge_points (
+              id TEXT PRIMARY KEY,
+              knowledge_code TEXT NOT NULL UNIQUE,
+              stage TEXT,
+              primary_dimension TEXT NOT NULL,
+              secondary_dimension TEXT NOT NULL,
+              tertiary_ability TEXT,
+              knowledge_point TEXT NOT NULL,
+              description TEXT,
+              cognitive_level TEXT,
+              suggested_question_types_json TEXT NOT NULL DEFAULT '[]',
+              source_references_json TEXT NOT NULL DEFAULT '[]',
+              tags_json TEXT NOT NULL DEFAULT '[]',
+              status TEXT NOT NULL DEFAULT 'active',
+              source_sheet TEXT,
+              source_row INTEGER,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+            """
+        )
         for table in ["question_drafts", "questions"]:
             _ensure_column(connection, table, "question_type", "TEXT NOT NULL DEFAULT '单选'")
             _ensure_column(connection, table, "tertiary_dimension", "TEXT NOT NULL DEFAULT ''")
             _ensure_column(connection, table, "quaternary_dimension", "TEXT NOT NULL DEFAULT ''")
             _ensure_column(connection, table, "knowledge_points_json", "TEXT NOT NULL DEFAULT '[]'")
+            _ensure_column(connection, table, "stage", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "knowledge_code", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "primary_dimension", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "tertiary_ability", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "knowledge_point", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "question_task", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "reference_answer", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "scoring_criteria", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "form", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "score_max", "REAL")
+            _ensure_column(connection, table, "discrimination", "REAL")
+            _ensure_column(connection, table, "source_sheet", "TEXT NOT NULL DEFAULT ''")
+            _ensure_column(connection, table, "source_row", "INTEGER NOT NULL DEFAULT 0")
     return get_db_path()
