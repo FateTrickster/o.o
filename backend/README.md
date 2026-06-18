@@ -171,6 +171,60 @@ python -m backend.app.scripts.codex_draft_tool plan --per-knowledge 2 --max-know
 
 Use the generated plan for Codex-assisted questions, then import them with `codex_draft_tool import`. Compare the resulting drafts by `generation_jobs.provider`.
 
+## Knowledge-Point Question Pipeline
+
+Use this newer pipeline when you want the backend to run the full right-side generation flow from the normalized `knowledge_points` table:
+
+```bash
+python -m backend.app.scripts.generate_question_pipeline --provider mock --limit-per-dimension 1 --dry-run
+```
+
+Generate candidates and write only passed, non-duplicate items into `question_drafts`:
+
+```bash
+python -m backend.app.scripts.generate_question_pipeline ^
+  --provider xfyun ^
+  --limit-per-dimension 5 ^
+  --count-per-knowledge-point 2 ^
+  --prompt-batch-size 5 ^
+  --requirement "生成初中 AI 素养场景化单选题，选项要有区分度。" ^
+  --write-drafts ^
+  --output-dir outputs/question-pipeline
+```
+
+Run multiple providers for comparison:
+
+```bash
+python -m backend.app.scripts.generate_question_pipeline ^
+  --provider xfyun ^
+  --provider deepseek ^
+  --limit-per-dimension 3 ^
+  --count-per-knowledge-point 1 ^
+  --write-drafts
+```
+
+Useful filters:
+
+```bash
+python -m backend.app.scripts.generate_question_pipeline ^
+  --dimension "理解AI（Understand）" ^
+  --secondary-dimension "概念认知" ^
+  --knowledge-code J-U-1.1.1.1-0001 ^
+  --show-prompt ^
+  --dry-run
+```
+
+The pipeline does this in order:
+
+- reads task config from CLI or `--config task.json`
+- selects knowledge points by stage, dimension, secondary dimension, or knowledge code
+- builds a reusable structured JSON prompt
+- calls one or more providers (`mock`, `xfyun`, `deepseek`)
+- normalizes options/answers/tags
+- checks structure, quality, and duplicate similarity
+- writes passed candidates into `question_drafts` only when `--write-drafts` is set
+- outputs JSON and CSV reports under `outputs/`
+
 ## Core Endpoints
 
 ```text

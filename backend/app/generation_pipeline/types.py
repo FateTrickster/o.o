@@ -19,6 +19,7 @@ class TaskSpec:
     difficulty_target: str = "medium"
     cognitive_level_target: str = ""
     requirement: str = ""
+    prompt_batch_size: int = 5
     similarity_threshold: float = 0.82
     write_drafts: bool = False
     output_dir: str = "outputs"
@@ -93,5 +94,6 @@ class PipelineReport:
     selected_points: List[KnowledgePointContext]
     candidates: List[PipelineCandidate]
     created_drafts: int = 0
+    errors: List[str] = field(default_factory=list)
     report_json: str = ""
-    report_xlsx: str = ""
+    report_csv: str = ""
