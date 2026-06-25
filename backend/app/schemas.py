@@ -120,6 +120,36 @@ class GenerationBatch(BaseModel):
     error: Optional[str] = None
 
 
+class QuestionPipelineRunRequest(BaseModel):
+    name: str = "frontend-pipeline-run"
+    stage: str = "初中"
+    providers: List[str] = Field(default_factory=lambda: ["mock"])
+    dimensions: List[str] = Field(default_factory=list)
+    secondaryDimensions: List[str] = Field(default_factory=list)
+    knowledgeCodes: List[str] = Field(default_factory=list)
+    questionType: str = "单选"
+    countPerKnowledgePoint: int = Field(default=1, ge=1, le=20)
+    limitPerDimension: int = Field(default=1, ge=0)
+    maxKnowledgePoints: int = Field(default=0, ge=0)
+    promptBatchSize: int = Field(default=5, ge=1, le=20)
+    difficultyTarget: str = "medium"
+    cognitiveLevelTarget: str = ""
+    requirement: str = ""
+    similarityThreshold: float = Field(default=0.82, ge=0, le=1)
+    writeDrafts: bool = True
+    outputDir: str = "outputs/question-pipeline"
+
+
+class QuestionPipelineRunResult(BaseModel):
+    selectedKnowledgePoints: int
+    generatedCandidates: int
+    createdDrafts: int
+    errors: List[str] = Field(default_factory=list)
+    reportJson: str = ""
+    reportCsv: str = ""
+    candidates: List[Dict[str, Any]] = Field(default_factory=list)
+
+
 class QuestionType(BaseModel):
     id: str
     name: str

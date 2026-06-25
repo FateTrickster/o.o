@@ -511,6 +511,58 @@ textarea {
   margin-top: 3px;
 }
 
+.inline-check {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-check input {
+  width: auto;
+  min-height: auto;
+}
+
+.pipeline-panel {
+  margin-bottom: 16px;
+}
+
+.pipeline-message {
+  margin: 12px 16px 0;
+}
+
+.pipeline-result {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+}
+
+.pipeline-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pipeline-candidates {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pipeline-candidate {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.pipeline-candidate strong {
+  display: block;
+  margin-top: 8px;
+}
+
+.pipeline-candidate p {
+  margin: 8px 0 0;
+}
+
 .draft-card-list {
   display: grid;
   gap: 14px;

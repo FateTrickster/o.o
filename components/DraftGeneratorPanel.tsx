@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
+import PipelineGeneratorPanel from "@/components/PipelineGeneratorPanel";
 import { KnowledgeEntry } from "@/types/knowledge";
 import { GenerationBatch, GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
 import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus, QuestionType } from "@/types/question";
@@ -396,6 +397,8 @@ export default function DraftGeneratorPanel() {
 
       {error ? <div className="error-box">{error}</div> : null}
       {statusMessage ? <div className="status-box">{statusMessage}</div> : null}
+
+      <PipelineGeneratorPanel onCompleted={loadData} />
 
       <section className="panel draft-generator">
         <div className="panel-header">

@@ -5,6 +5,9 @@ from fastapi import FastAPI, HTTPException
 from .config import ROOT_DIR, get_db_path, get_xfyun_model
 from .database import init_db
 from .framework import UACE_FRAMEWORK
+from .generation_pipeline.report import candidate_to_row
+from .generation_pipeline.runner import run_pipeline as run_question_pipeline
+from .generation_pipeline.types import TaskSpec
 from .pipeline import generate_drafts as run_generate_drafts
 from .repositories import (
     accept_draft,
@@ -47,6 +50,8 @@ from .schemas import (
     Question,
     QuestionDraft,
     QuestionInput,
+    QuestionPipelineRunRequest,
+    QuestionPipelineRunResult,
     QuestionType,
     QuestionTypeExample,
 )
@@ -212,6 +217,43 @@ async def generate_drafts(request: GenerateDraftRequest):
         return await run_generate_drafts(request)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/question-pipeline/run", response_model=QuestionPipelineRunResult)
+async def run_question_generation_pipeline(request: QuestionPipelineRunRequest):
+    task = TaskSpec(
+        name=request.name,
+        stage=request.stage,
+        dimensions=request.dimensions,
+        secondary_dimensions=request.secondaryDimensions,
+        knowledge_codes=request.knowledgeCodes,
+        providers=request.providers,
+        question_type=request.questionType,
+        count_per_knowledge_point=request.countPerKnowledgePoint,
+        limit_per_dimension=request.limitPerDimension,
+        max_knowledge_points=request.maxKnowledgePoints,
+        difficulty_target=request.difficultyTarget,
+        cognitive_level_target=request.cognitiveLevelTarget,
+        requirement=request.requirement,
+        prompt_batch_size=request.promptBatchSize,
+        similarity_threshold=request.similarityThreshold,
+        write_drafts=request.writeDrafts,
+        output_dir=request.outputDir,
+    )
+    try:
+        report = await run_question_pipeline(task)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return QuestionPipelineRunResult(
+        selectedKnowledgePoints=len(report.selected_points),
+        generatedCandidates=len(report.candidates),
+        createdDrafts=report.created_drafts,
+        errors=report.errors,
+        reportJson=report.report_json,
+        reportCsv=report.report_csv,
+        candidates=[candidate_to_row(index, candidate) for index, candidate in enumerate(report.candidates, start=1)],
+    )
 
 
 @app.put("/drafts/{draft_id}", response_model=QuestionDraft)
