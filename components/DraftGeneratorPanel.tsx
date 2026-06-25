@@ -596,18 +596,18 @@ function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
               </div>
               <p>{job.requirement || "未填写额外出题要求"}</p>
               <div className="badge-row">
-                {job.targetDimensions.map((dimension) => (
-                  <span className="badge" key={dimension}>
+                {job.targetDimensions.map((dimension, index) => (
+                  <span className="badge" key={`${dimension}-${index}`}>
                     {dimension}
                   </span>
                 ))}
-                {job.targetSecondaryDimensions.map((dimension) => (
-                  <span className="badge" key={dimension}>
+                {job.targetSecondaryDimensions.map((dimension, index) => (
+                  <span className="badge" key={`${dimension}-${index}`}>
                     {dimension}
                   </span>
                 ))}
-                {job.targetTags.map((tag) => (
-                  <span className="badge" key={tag}>
+                {job.targetTags.map((tag, index) => (
+                  <span className="badge" key={`${tag}-${index}`}>
                     {tag}
                   </span>
                 ))}

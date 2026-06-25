@@ -586,8 +586,8 @@ export default function QuestionBankApp() {
                         <strong>{question.title}</strong>
                         <span>{question.scenario}</span>
                         <div className="badge-row">
-                          {question.tags.slice(0, 3).map((tag) => (
-                            <span className="badge" key={tag}>
+                          {question.tags.slice(0, 3).map((tag, index) => (
+                            <span className="badge" key={`${tag}-${index}`}>
                               {tag}
                             </span>
                           ))}
@@ -963,13 +963,15 @@ function QuestionDetail({ question, onEdit, onDelete }: QuestionDetailProps) {
 
         <h3>标签</h3>
         <div className="badge-row">
-          {question.tags.length > 0 ? question.tags.map((tag) => <span className="badge" key={tag}>{tag}</span>) : "无"}
+          {question.tags.length > 0
+            ? question.tags.map((tag, index) => <span className="badge" key={`${tag}-${index}`}>{tag}</span>)
+            : "无"}
         </div>
 
         <h3>知识点</h3>
         <div className="badge-row">
           {question.knowledgePoints && question.knowledgePoints.length > 0
-            ? question.knowledgePoints.map((point) => <span className="badge" key={point}>{point}</span>)
+            ? question.knowledgePoints.map((point, index) => <span className="badge" key={`${point}-${index}`}>{point}</span>)
             : "无"}
         </div>
 

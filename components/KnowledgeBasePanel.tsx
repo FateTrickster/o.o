@@ -482,8 +482,8 @@ export default function KnowledgeBasePanel() {
                       <td>{entry.sourceFileName}</td>
                       <td>
                         <div className="badge-row">
-                          {entry.tags.slice(0, 3).map((tag) => (
-                            <span className="badge" key={tag}>
+                          {entry.tags.slice(0, 3).map((tag, index) => (
+                            <span className="badge" key={`${tag}-${index}`}>
                               {tag}
                             </span>
                           ))}
@@ -739,7 +739,9 @@ function KnowledgeDetail({ entry, onEdit, onDelete }: KnowledgeDetailProps) {
 
         <h3>标签</h3>
         <div className="badge-row">
-          {entry.tags.length > 0 ? entry.tags.map((tag) => <span className="badge" key={tag}>{tag}</span>) : "无"}
+          {entry.tags.length > 0
+            ? entry.tags.map((tag, index) => <span className="badge" key={`${tag}-${index}`}>{tag}</span>)
+            : "无"}
         </div>
 
         <p className="muted">创建：{new Date(entry.createdAt).toLocaleString()}</p>
