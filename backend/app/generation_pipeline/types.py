@@ -22,6 +22,9 @@ class TaskSpec:
     requirement: str = ""
     prompt_batch_size: int = 5
     similarity_threshold: float = 0.82
+    ai_review_enabled: bool = False
+    ai_review_provider: str = "kimi"
+    ai_review_min_score: int = 75
     write_drafts: bool = False
     output_dir: str = "outputs"
 
@@ -78,6 +81,12 @@ class ReviewResult:
     duplicate_group: str = ""
     duplicate_score: float = 0.0
     duplicate_with: str = ""
+    ai_review_provider: str = ""
+    ai_review_passed: bool = True
+    ai_review_score: int = 0
+    ai_review_level: str = ""
+    ai_review_issues: List[str] = field(default_factory=list)
+    ai_review_suggestions: List[str] = field(default_factory=list)
     passed: bool = True
 
 

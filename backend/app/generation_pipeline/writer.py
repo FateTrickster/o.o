@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Dict, Iterable, List
 
-from backend.app.config import get_deepseek_model, get_xfyun_model
+from backend.app.config import get_deepseek_model, get_kimi_model, get_xfyun_model
 from backend.app.repositories import (
     complete_generation_batch,
     complete_generation_job,
@@ -22,6 +22,8 @@ def _model_for_provider(provider: str) -> str:
         return get_xfyun_model()
     if provider == "deepseek":
         return get_deepseek_model()
+    if provider == "kimi":
+        return get_kimi_model()
     return provider
 
 
@@ -43,6 +45,14 @@ def _candidate_tags(candidate: PipelineCandidate) -> List[str]:
         f"quality:{review.quality_level}",
         "pipeline:passed" if review.passed else "pipeline:blocked",
     ]
+    if review.ai_review_provider:
+        tags.extend(
+            [
+                f"ai-review:{review.ai_review_provider}",
+                f"ai-review-score:{review.ai_review_score}",
+                "ai-review:passed" if review.ai_review_passed else "ai-review:blocked",
+            ]
+        )
     if review.duplicate_group:
         tags.append("duplicate")
     return list(dict.fromkeys(tag for tag in tags if tag))

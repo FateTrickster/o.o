@@ -238,6 +238,9 @@ async def run_question_generation_pipeline(request: QuestionPipelineRunRequest):
         requirement=request.requirement,
         prompt_batch_size=request.promptBatchSize,
         similarity_threshold=request.similarityThreshold,
+        ai_review_enabled=request.aiReviewEnabled,
+        ai_review_provider=request.aiReviewProvider,
+        ai_review_min_score=request.aiReviewMinScore,
         write_drafts=request.writeDrafts,
         output_dir=request.outputDir,
     )

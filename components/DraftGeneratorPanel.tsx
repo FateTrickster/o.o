@@ -425,12 +425,23 @@ function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
     return grouped;
   }, [batches]);
 
+  const latestJob = jobs[0];
+
   return (
-    <section className="panel generation-job-list">
-      <div className="panel-header">
-        <h2>生成任务记录</h2>
-        <span className="muted">{loading ? "加载中..." : `${jobs.length} 次任务`}</span>
-      </div>
+    <details className="panel generation-job-list">
+      <summary className="panel-header generation-job-summary">
+        <div>
+          <h2>生成任务记录</h2>
+          <span className="muted">
+            {loading
+              ? "加载中..."
+              : latestJob
+                ? `${jobs.length} 次任务 · 最近 ${jobStatusText(latestJob.status)} · ${latestJob.provider}`
+                : "暂无任务"}
+          </span>
+        </div>
+        <span className="badge">展开查看</span>
+      </summary>
       <div className="job-list">
         {jobs.map((job) => (
           <article className="job-item" key={job.id}>
@@ -487,7 +498,7 @@ function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
         ))}
         {!loading && jobs.length === 0 ? <div className="empty-state">暂无生成任务记录。</div> : null}
       </div>
-    </section>
+    </details>
   );
 }
 

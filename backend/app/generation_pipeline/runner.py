@@ -5,6 +5,7 @@ from typing import Iterable, List
 from backend.app.database import init_db
 from backend.app.repositories import seed_framework
 
+from .ai_review import ai_review_candidates
 from .providers import generate_for_provider
 from .report import write_report
 from .review import review_candidates
@@ -40,6 +41,7 @@ async def run_pipeline(task: TaskSpec) -> PipelineReport:
 
     point_by_code = {point.knowledge_code: point for point in selected_points}
     candidates = review_candidates(generated, point_by_code, task) if generated else []
+    errors.extend(await ai_review_candidates(candidates, task))
 
     report = PipelineReport(
         task=task,

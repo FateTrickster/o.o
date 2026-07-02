@@ -32,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--provider",
         action="append",
         default=[],
-        help="Provider: mock, xfyun, deepseek. Repeat or comma-separate.",
+        help="Provider: mock, xfyun, deepseek, kimi. Repeat or comma-separate.",
     )
     parser.add_argument("--question-type", default="", help="Question type, default 单选题.")
     parser.add_argument("--count-per-knowledge-point", type=int, default=None)
@@ -43,6 +43,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cognitive-level", default="", help="remember/understand/apply/analyze/evaluate/create.")
     parser.add_argument("--requirement", default="", help="Additional generation requirement.")
     parser.add_argument("--similarity-threshold", type=float, default=None)
+    parser.add_argument("--ai-review", action="store_true", help="Use an AI reviewer after rule-based review.")
+    parser.add_argument("--ai-review-provider", default="", help="AI review provider, currently kimi.")
+    parser.add_argument("--ai-review-min-score", type=int, default=None, help="Minimum AI review score to pass.")
     parser.add_argument("--output-dir", default="")
     parser.add_argument("--write-drafts", action="store_true", help="Write passed candidates into question_drafts.")
     parser.add_argument("--dry-run", action="store_true", help="Print task and selected knowledge points only.")
@@ -67,6 +70,9 @@ def _overrides(args: argparse.Namespace) -> dict:
         "cognitiveLevelTarget": args.cognitive_level,
         "requirement": args.requirement,
         "similarityThreshold": args.similarity_threshold,
+        "aiReviewEnabled": args.ai_review,
+        "aiReviewProvider": args.ai_review_provider,
+        "aiReviewMinScore": args.ai_review_min_score,
         "outputDir": args.output_dir,
         "writeDrafts": args.write_drafts,
     }
@@ -83,6 +89,8 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
         parser.error("--prompt-batch-size must be 1 or greater")
     if args.similarity_threshold is not None and not 0 <= args.similarity_threshold <= 1:
         parser.error("--similarity-threshold must be between 0 and 1")
+    if args.ai_review_min_score is not None and not 0 <= args.ai_review_min_score <= 100:
+        parser.error("--ai-review-min-score must be between 0 and 100")
 
 
 def _print_plan(task, points) -> None:

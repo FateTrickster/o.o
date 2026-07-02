@@ -563,6 +563,42 @@ textarea {
   margin: 8px 0 0;
 }
 
+.ai-review-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.ai-review-title {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.ai-review-section {
+  margin-top: 10px;
+}
+
+.ai-review-section ul {
+  margin: 6px 0 0 18px;
+  padding: 0;
+}
+
+.ai-review-section li {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 3px 0;
+}
+
+.source-reference {
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
 .draft-card-list {
   display: grid;
   gap: 14px;
@@ -598,6 +634,30 @@ textarea {
 .draft-summary-card strong {
   display: block;
   margin-bottom: 4px;
+}
+
+.generation-job-list {
+  margin-bottom: 16px;
+}
+
+.generation-job-summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.generation-job-summary::-webkit-details-marker {
+  display: none;
+}
+
+.generation-job-summary::after {
+  color: var(--muted);
+  content: "⌄";
+  font-size: 18px;
+  margin-left: 8px;
+}
+
+.generation-job-list[open] .generation-job-summary::after {
+  transform: rotate(180deg);
 }
 
 .job-list {

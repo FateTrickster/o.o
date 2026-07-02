@@ -11,6 +11,9 @@ from backend.app.config import (
     get_deepseek_api_key,
     get_deepseek_base_url,
     get_deepseek_model,
+    get_kimi_api_key,
+    get_kimi_base_url,
+    get_kimi_model,
     get_xfyun_api_key,
     get_xfyun_base_url,
     get_xfyun_model,
@@ -184,6 +187,17 @@ async def api_generate(provider: str, points: List[KnowledgePointContext], task:
             "messages": build_structured_prompt(task, points),
             "temperature": 0.35,
             "response_format": {"type": "json_object"},
+        }
+    elif provider == "kimi":
+        api_key = get_kimi_api_key()
+        base_url = get_kimi_base_url()
+        model = get_kimi_model()
+        payload = {
+            "model": model,
+            "messages": build_structured_prompt(task, points),
+            "temperature": 0.6,
+            "response_format": {"type": "json_object"},
+            "thinking": {"type": "disabled"},
         }
     else:
         raise ValueError(f"Unsupported API provider: {provider}")

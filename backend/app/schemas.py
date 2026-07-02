@@ -137,6 +137,9 @@ class QuestionPipelineRunRequest(BaseModel):
     cognitiveLevelTarget: str = ""
     requirement: str = ""
     similarityThreshold: float = Field(default=0.82, ge=0, le=1)
+    aiReviewEnabled: bool = False
+    aiReviewProvider: str = "kimi"
+    aiReviewMinScore: int = Field(default=75, ge=0, le=100)
     writeDrafts: bool = True
     outputDir: str = "outputs/question-pipeline"
 

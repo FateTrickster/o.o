@@ -21,6 +21,13 @@ type PipelineResultCandidate = {
   qualityLevel: string;
   duplicateScore: number;
   duplicateWith?: string;
+  aiReviewProvider?: string;
+  aiReviewPassed?: boolean;
+  aiReviewScore?: number;
+  aiReviewLevel?: string;
+  aiReviewIssues?: string;
+  aiReviewSuggestions?: string;
+  sourceReference?: string;
   tags: string;
 };
 
@@ -38,7 +45,7 @@ type PipelineGeneratorPanelProps = {
   onCompleted: () => Promise<void> | void;
 };
 
-const providerOptions = ["mock", "xfyun", "deepseek"];
+const providerOptions = ["mock", "xfyun", "deepseek", "kimi"];
 const difficultyOptions = ["easy", "medium", "hard"];
 const cognitiveOptions = ["", "remember", "understand", "apply", "analyze", "evaluate", "create"];
 
@@ -49,6 +56,13 @@ function toggleValue(values: string[], value: string) {
 function splitCodes(value: string) {
   return value
     .split(/[,，;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function splitReviewText(value?: string) {
+  return (value ?? "")
+    .split(/[；;\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -68,6 +82,8 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
   const [difficultyTarget, setDifficultyTarget] = useState("medium");
   const [cognitiveLevelTarget, setCognitiveLevelTarget] = useState("");
   const [similarityThreshold, setSimilarityThreshold] = useState(0.82);
+  const [aiReviewEnabled, setAiReviewEnabled] = useState(false);
+  const [aiReviewMinScore, setAiReviewMinScore] = useState(75);
   const [writeDrafts, setWriteDrafts] = useState(true);
   const [requirement, setRequirement] = useState("生成初中 AI 素养场景化单选题，选项要有区分度。");
   const [running, setRunning] = useState(false);
@@ -227,6 +243,9 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
           cognitiveLevelTarget,
           requirement,
           similarityThreshold,
+          aiReviewEnabled,
+          aiReviewProvider: "kimi",
+          aiReviewMinScore,
           writeDrafts,
           outputDir: "outputs/question-pipeline"
         })
@@ -348,7 +367,7 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
                 </label>
               ))}
             </div>
-            <p className="muted">mock 用于本地流程测试；xfyun/deepseek 需要本地环境变量已配置且接口可用。</p>
+            <p className="muted">mock 用于本地流程测试；xfyun/deepseek/kimi 需要本地环境变量已配置且接口可用。</p>
           </label>
           <label className="form-row full">
             <span>一级维度</span>
@@ -416,6 +435,22 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
             <textarea value={requirement} onChange={(event) => setRequirement(event.target.value)} />
           </label>
           <label className="inline-check">
+            <input checked={aiReviewEnabled} type="checkbox" onChange={(event) => setAiReviewEnabled(event.target.checked)} />
+            <span>启用 Kimi AI 审题</span>
+          </label>
+          {aiReviewEnabled ? (
+            <label className="form-row">
+              <span>AI 审题最低分</span>
+              <input
+                max={100}
+                min={0}
+                type="number"
+                value={aiReviewMinScore}
+                onChange={(event) => setAiReviewMinScore(Math.max(0, Math.min(100, Number(event.target.value) || 0)))}
+              />
+            </label>
+          ) : null}
+          <label className="inline-check">
             <input checked={writeDrafts} type="checkbox" onChange={(event) => setWriteDrafts(event.target.checked)} />
             <span>通过校验后写入 question_drafts</span>
           </label>
@@ -452,26 +487,71 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
             </div>
           ) : null}
           <div className="pipeline-candidates">
-            {result.candidates.slice(0, 5).map((candidate) => (
-              <article className="pipeline-candidate" key={`${candidate.provider}-${candidate.index}`}>
-                <div className="badge-row">
-                  <span className="badge">{candidate.provider}</span>
-                  <span className={candidate.passed ? "badge status-reviewed" : "badge job-status-failed"}>
-                    {candidate.passed ? "通过" : "拦截"}
-                  </span>
-                  <span className="badge">结构 {candidate.structureResult}</span>
-                  <span className="badge">质量 {candidate.qualityLevel}</span>
-                  <span className="badge">相似度 {Number(candidate.duplicateScore || 0).toFixed(2)}</span>
-                </div>
-                <strong>{candidate.title}</strong>
-                <p>{candidate.scenario}</p>
-                <p>{candidate.question}</p>
-                <p className="muted">
-                  {candidate.knowledgeCode} · {candidate.primaryDimension} · {candidate.secondaryDimension} ·{" "}
-                  {candidate.knowledgePoint}
-                </p>
-              </article>
-            ))}
+            {result.candidates.slice(0, 5).map((candidate) => {
+              const reviewIssues = splitReviewText(candidate.aiReviewIssues);
+              const reviewSuggestions = splitReviewText(candidate.aiReviewSuggestions);
+              return (
+                <article className="pipeline-candidate" key={`${candidate.provider}-${candidate.index}`}>
+                  <div className="badge-row">
+                    <span className="badge">{candidate.provider}</span>
+                    <span className={candidate.passed ? "badge status-reviewed" : "badge job-status-failed"}>
+                      {candidate.passed ? "通过" : "拦截"}
+                    </span>
+                    <span className="badge">结构 {candidate.structureResult}</span>
+                    <span className="badge">质量 {candidate.qualityLevel}</span>
+                    <span className="badge">相似度 {Number(candidate.duplicateScore || 0).toFixed(2)}</span>
+                    {candidate.aiReviewProvider ? (
+                      <span className={candidate.aiReviewPassed ? "badge status-reviewed" : "badge job-status-failed"}>
+                        AI审题 {candidate.aiReviewScore ?? 0}
+                      </span>
+                    ) : null}
+                  </div>
+                  <strong>{candidate.title}</strong>
+                  <p>{candidate.scenario}</p>
+                  <p>{candidate.question}</p>
+                  <p className="muted">
+                    {candidate.knowledgeCode} · {candidate.primaryDimension} · {candidate.secondaryDimension} ·{" "}
+                    {candidate.knowledgePoint}
+                  </p>
+                  {candidate.aiReviewProvider ? (
+                    <div className="ai-review-box">
+                      <div className="ai-review-title">
+                        <strong>Kimi 审题报告</strong>
+                        <span className={candidate.aiReviewPassed ? "badge status-reviewed" : "badge job-status-failed"}>
+                          {candidate.aiReviewPassed ? "通过" : "未通过"} · {candidate.aiReviewScore ?? 0} 分
+                          {candidate.aiReviewLevel ? ` · ${candidate.aiReviewLevel}` : ""}
+                        </span>
+                      </div>
+                      {reviewIssues.length > 0 ? (
+                        <div className="ai-review-section">
+                          <span className="muted">主要问题</span>
+                          <ul>
+                            {reviewIssues.map((issue, index) => (
+                              <li key={`issue-${index}`}>{issue}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <p className="muted">未返回明显问题。</p>
+                      )}
+                      {reviewSuggestions.length > 0 ? (
+                        <div className="ai-review-section">
+                          <span className="muted">修改建议</span>
+                          <ul>
+                            {reviewSuggestions.map((suggestion, index) => (
+                              <li key={`suggestion-${index}`}>{suggestion}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {candidate.sourceReference ? (
+                    <p className="muted source-reference">来源：{candidate.sourceReference}</p>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </div>
       ) : null}

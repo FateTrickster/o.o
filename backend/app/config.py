@@ -26,7 +26,8 @@ _LOCAL_ENV = _load_env_file(ROOT_DIR / ".env.local")
 
 
 def get_setting(name: str, default: Optional[str] = None) -> Optional[str]:
-    return os.getenv(name) or _LOCAL_ENV.get(name) or default
+    current_env = _load_env_file(ROOT_DIR / ".env.local")
+    return os.getenv(name) or current_env.get(name) or _LOCAL_ENV.get(name) or default
 
 
 def get_db_path() -> Path:
@@ -60,8 +61,27 @@ def get_deepseek_api_key() -> str:
 
 
 def get_deepseek_model() -> str:
-    return get_setting("DEEPSEEK_MODEL", "deepseek-chat") or "deepseek-chat"
+    return get_setting("DEEPSEEK_MODEL", "deepseek-v4-pro") or "deepseek-v4-pro"
 
 
 def get_deepseek_base_url() -> str:
     return (get_setting("DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "https://api.deepseek.com").rstrip("/")
+
+
+def get_kimi_api_key() -> str:
+    value = (
+        get_setting("AI_LITERACY_KIMI_API_KEY")
+        or get_setting("KIMI_API_KEY")
+        or get_setting("MOONSHOT_API_KEY", "")
+    )
+    if not value:
+        raise RuntimeError("AI_LITERACY_KIMI_API_KEY, KIMI_API_KEY, or MOONSHOT_API_KEY is not configured")
+    return value
+
+
+def get_kimi_model() -> str:
+    return get_setting("KIMI_MODEL", "kimi-k2.6") or "kimi-k2.6"
+
+
+def get_kimi_base_url() -> str:
+    return (get_setting("KIMI_BASE_URL", "https://api.moonshot.cn/v1") or "https://api.moonshot.cn/v1").rstrip("/")

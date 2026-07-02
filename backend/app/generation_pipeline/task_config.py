@@ -25,6 +25,16 @@ def split_csv(values: Iterable[str]) -> List[str]:
     return items
 
 
+def _bool_value(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
 def load_task_spec(path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> TaskSpec:
     data: Dict[str, Any] = {}
     if path:
@@ -48,7 +58,10 @@ def load_task_spec(path: Optional[str] = None, overrides: Optional[Dict[str, Any
         requirement=str(data.get("requirement") or ""),
         prompt_batch_size=int(data.get("promptBatchSize") or data.get("prompt_batch_size") or 5),
         similarity_threshold=float(data.get("similarityThreshold") or data.get("similarity_threshold") or 0.82),
-        write_drafts=bool(data.get("writeDrafts") or data.get("write_drafts") or False),
+        ai_review_enabled=_bool_value(data.get("aiReviewEnabled") or data.get("ai_review_enabled"), False),
+        ai_review_provider=str(data.get("aiReviewProvider") or data.get("ai_review_provider") or "kimi"),
+        ai_review_min_score=int(data.get("aiReviewMinScore") or data.get("ai_review_min_score") or 75),
+        write_drafts=_bool_value(data.get("writeDrafts") or data.get("write_drafts"), False),
         output_dir=str(data.get("outputDir") or data.get("output_dir") or "outputs"),
     )
 
@@ -71,6 +84,9 @@ def task_to_dict(task: TaskSpec) -> Dict[str, Any]:
         "requirement": task.requirement,
         "promptBatchSize": task.prompt_batch_size,
         "similarityThreshold": task.similarity_threshold,
+        "aiReviewEnabled": task.ai_review_enabled,
+        "aiReviewProvider": task.ai_review_provider,
+        "aiReviewMinScore": task.ai_review_min_score,
         "writeDrafts": task.write_drafts,
         "outputDir": task.output_dir,
     }
