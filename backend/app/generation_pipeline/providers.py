@@ -188,7 +188,9 @@ async def api_generate(provider: str, points: List[KnowledgePointContext], task:
     else:
         raise ValueError(f"Unsupported API provider: {provider}")
 
-    result = await asyncio.to_thread(
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(
+        None,
         _post_json,
         f"{base_url}/chat/completions",
         {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},

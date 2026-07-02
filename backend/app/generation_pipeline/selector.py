@@ -44,6 +44,15 @@ def select_knowledge_points(task: TaskSpec) -> List[KnowledgePointContext]:
             continue
         if task.secondary_dimensions and point.secondary_dimension not in task.secondary_dimensions:
             continue
+        if task.target_tags:
+            point_tags = set(point.tags)
+            point_tags.update(
+                item
+                for item in [point.stage, point.primary_dimension, point.secondary_dimension, point.tertiary_ability, point.knowledge_point]
+                if item
+            )
+            if not any(tag in point_tags for tag in task.target_tags):
+                continue
         by_dimension[point.primary_dimension].append(point)
 
     selected: List[KnowledgePointContext] = []

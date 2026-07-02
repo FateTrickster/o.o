@@ -587,6 +587,19 @@ textarea {
   margin: 6px 0 0;
 }
 
+.draft-summary-card {
+  gap: 10px;
+}
+
+.draft-summary-card .draft-card-header {
+  align-items: flex-start;
+}
+
+.draft-summary-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
 .job-list {
   display: grid;
   gap: 10px;

@@ -1,11 +1,10 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
+import { useEffect, useMemo, useState } from "react";
 import PipelineGeneratorPanel from "@/components/PipelineGeneratorPanel";
-import { KnowledgeEntry } from "@/types/knowledge";
+import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
 import { GenerationBatch, GenerationJob, QuestionDraft, QuestionDraftInput } from "@/types/draft";
-import { CognitiveLevel, DifficultyEstimate, QuestionOption, QuestionStatus, QuestionType } from "@/types/question";
+import { CognitiveLevel, DifficultyEstimate, KnowledgePoint, QuestionOption, QuestionStatus, QuestionType } from "@/types/question";
 
 const cognitiveOptions: CognitiveLevel[] = ["remember", "understand", "apply", "analyze", "evaluate", "create"];
 const difficultyOptions: DifficultyEstimate[] = ["easy", "medium", "hard"];
@@ -27,10 +26,6 @@ const questionTypeOptions: QuestionType[] = [
   "方案设计题",
   "项目任务题"
 ];
-
-function toggleValue(values: string[], value: string) {
-  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
-}
 
 function cognitiveText(level: CognitiveLevel) {
   const map: Record<CognitiveLevel, string> = {
@@ -99,20 +94,14 @@ function toDraftInput(draft: QuestionDraft): QuestionDraftInput {
 }
 
 export default function DraftGeneratorPanel() {
-  const [knowledgeEntries, setKnowledgeEntries] = useState<KnowledgeEntry[]>([]);
-  const [selectedKnowledgeIds, setSelectedKnowledgeIds] = useState<string[]>([]);
-  const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
-  const [selectedSecondaryDimensions, setSelectedSecondaryDimensions] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [requirement, setRequirement] = useState("");
-  const [draftCount, setDraftCount] = useState(3);
   const [drafts, setDrafts] = useState<QuestionDraft[]>([]);
+  const [knowledgePoints, setKnowledgePoints] = useState<KnowledgePoint[]>([]);
   const [generationJobs, setGenerationJobs] = useState<GenerationJob[]>([]);
   const [generationBatches, setGenerationBatches] = useState<GenerationBatch[]>([]);
   const [tagsTextById, setTagsTextById] = useState<Record<string, string>>({});
   const [knowledgePointsTextById, setKnowledgePointsTextById] = useState<Record<string, string>>({});
+  const [expandedDraftId, setExpandedDraftId] = useState("");
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
   const [savingId, setSavingId] = useState("");
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -122,25 +111,25 @@ export default function DraftGeneratorPanel() {
     setError("");
 
     try {
-      const [knowledgeResponse, draftResponse, jobsResponse, batchesResponse] = await Promise.all([
-        fetch("/api/knowledge", { cache: "no-store" }),
+      const [knowledgePointsResponse, draftResponse, jobsResponse, batchesResponse] = await Promise.all([
+        fetch("/api/knowledge-points", { cache: "no-store" }),
         fetch("/api/drafts", { cache: "no-store" }),
         fetch("/api/generation-jobs", { cache: "no-store" }),
         fetch("/api/generation-batches", { cache: "no-store" })
       ]);
 
-      if (!knowledgeResponse.ok || !draftResponse.ok || !jobsResponse.ok || !batchesResponse.ok) {
+      if (!knowledgePointsResponse.ok || !draftResponse.ok || !jobsResponse.ok || !batchesResponse.ok) {
         throw new Error("数据加载失败");
       }
 
-      const [knowledgeData, draftData, jobsData, batchesData] = (await Promise.all([
-        knowledgeResponse.json(),
+      const [knowledgePointsData, draftData, jobsData, batchesData] = (await Promise.all([
+        knowledgePointsResponse.json(),
         draftResponse.json(),
         jobsResponse.json(),
         batchesResponse.json()
-      ])) as [KnowledgeEntry[], QuestionDraft[], GenerationJob[], GenerationBatch[]];
+      ])) as [KnowledgePoint[], QuestionDraft[], GenerationJob[], GenerationBatch[]];
 
-      setKnowledgeEntries(knowledgeData);
+      setKnowledgePoints(knowledgePointsData);
       setDrafts(draftData);
       setGenerationJobs(jobsData);
       setGenerationBatches(batchesData);
@@ -159,80 +148,39 @@ export default function DraftGeneratorPanel() {
     void loadData();
   }, []);
 
-  const selectedKnowledgeEntries = useMemo(
-    () => knowledgeEntries.filter((entry) => selectedKnowledgeIds.includes(entry.id)),
-    [knowledgeEntries, selectedKnowledgeIds]
-  );
-
-  const availableSecondaryDimensions = useMemo(
-    () => selectedDimensions.flatMap((dimension) => getSecondaryDimensions(dimension)),
-    [selectedDimensions]
-  );
-
-  const availableTags = useMemo(
-    () =>
-      Array.from(
-        new Set(selectedKnowledgeEntries.flatMap((entry) => entry.tags).map((tag) => tag.trim()).filter(Boolean))
-      ).sort(),
-    [selectedKnowledgeEntries]
-  );
-
-  useEffect(() => {
-    setSelectedSecondaryDimensions((current) =>
-      current.filter((dimension) => availableSecondaryDimensions.some((item) => item === dimension))
-    );
-  }, [availableSecondaryDimensions]);
-
-  useEffect(() => {
-    setSelectedTags((current) => current.filter((tag) => availableTags.includes(tag)));
-  }, [availableTags]);
-
-  function toggleKnowledge(id: string) {
-    setSelectedKnowledgeIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
-    );
-  }
-
-  async function generateDrafts(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (selectedKnowledgeIds.length === 0) {
-      setError("请先选择至少一个知识条目");
-      return;
-    }
-
-    setGenerating(true);
-    setError("");
-    setStatusMessage("");
-
-    const safeCount = Math.max(1, Math.min(20, Math.floor(draftCount || 1)));
-    setDraftCount(safeCount);
-
-    try {
-      const response = await fetch("/api/drafts/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          knowledgeIds: selectedKnowledgeIds,
-          requirement,
-          targetDimensions: selectedDimensions,
-          targetSecondaryDimensions: selectedSecondaryDimensions,
-          targetTags: selectedTags,
-          count: safeCount
-        })
-      });
-      const result = (await response.json()) as QuestionDraft[] | { error?: string };
-      if (!response.ok) {
-        throw new Error("error" in result ? result.error : "生成失败");
+  const dimensionOptions = useMemo(() => {
+    const values = Array.from(new Set(knowledgePoints.map((point) => point.primaryDimension).filter(Boolean)));
+    return values.sort((a, b) => {
+      const aIndex = aiLiteracyDimensions.indexOf(a as (typeof aiLiteracyDimensions)[number]);
+      const bIndex = aiLiteracyDimensions.indexOf(b as (typeof aiLiteracyDimensions)[number]);
+      if (aIndex === -1 && bIndex === -1) {
+        return a.localeCompare(b, "zh-Hans-CN");
       }
+      if (aIndex === -1) {
+        return 1;
+      }
+      if (bIndex === -1) {
+        return -1;
+      }
+      return aIndex - bIndex;
+    });
+  }, [knowledgePoints]);
 
-      await loadData();
-      setStatusMessage(`生成完成：新增 ${(result as QuestionDraft[]).length} 道草稿`);
-    } catch (currentError) {
-      setError(currentError instanceof Error ? currentError.message : "生成失败");
-    } finally {
-      setGenerating(false);
-    }
-  }
+  const secondaryOptionsByDimension = useMemo(() => {
+    const grouped = new Map<string, string[]>();
+    knowledgePoints.forEach((point) => {
+      if (!point.primaryDimension || !point.secondaryDimension) {
+        return;
+      }
+      const current = grouped.get(point.primaryDimension) ?? [];
+      if (!current.includes(point.secondaryDimension)) {
+        current.push(point.secondaryDimension);
+      }
+      grouped.set(point.primaryDimension, current);
+    });
+    grouped.forEach((items) => items.sort((a, b) => a.localeCompare(b, "zh-Hans-CN")));
+    return grouped;
+  }, [knowledgePoints]);
 
   function updateDraftField<K extends keyof QuestionDraftInput>(
     id: string,
@@ -391,7 +339,7 @@ export default function DraftGeneratorPanel() {
       <section className="section-heading">
         <div>
           <h2>出题草稿</h2>
-          <p>基于知识条目生成题目草稿，人工确认后进入正式题库。</p>
+          <p>基于后端知识点流水线生成题目草稿，人工确认后进入正式题库。</p>
         </div>
       </section>
 
@@ -399,118 +347,6 @@ export default function DraftGeneratorPanel() {
       {statusMessage ? <div className="status-box">{statusMessage}</div> : null}
 
       <PipelineGeneratorPanel onCompleted={loadData} />
-
-      <section className="panel draft-generator">
-        <div className="panel-header">
-          <h2>生成草稿</h2>
-          <span className="muted">{loading ? "加载中..." : `${knowledgeEntries.length} 条知识可选`}</span>
-        </div>
-        <form className="form-body" onSubmit={generateDrafts}>
-          <div className="knowledge-picker">
-            {knowledgeEntries.length === 0 ? (
-              <div className="empty-state">暂无知识条目，请先到知识库新增或导入。</div>
-            ) : (
-              knowledgeEntries.map((entry) => (
-                <label className="knowledge-choice" key={entry.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedKnowledgeIds.includes(entry.id)}
-                    onChange={() => toggleKnowledge(entry.id)}
-                  />
-                  <span>
-                    <strong>{entry.title}</strong>
-                    <small>{entry.sourceType} · {entry.sourceFileName}</small>
-                  </span>
-                </label>
-              ))
-            )}
-          </div>
-          <div className="criteria-section">
-            <div className="criteria-block">
-              <label>一级维度</label>
-              <div className="choice-grid">
-                {aiLiteracyDimensions.map((dimension) => (
-                  <label className="filter-choice" key={dimension}>
-                    <input
-                      type="checkbox"
-                      checked={selectedDimensions.includes(dimension)}
-                      onChange={() => setSelectedDimensions((current) => toggleValue(current, dimension))}
-                    />
-                    <span>{dimension}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="criteria-block">
-              <label>二级维度</label>
-              {selectedDimensions.length === 0 ? (
-                <p className="muted">先选择一级维度后，可勾选对应二级维度。</p>
-              ) : (
-                <div className="choice-grid secondary-choice-grid">
-                  {availableSecondaryDimensions.map((dimension) => (
-                    <label className="filter-choice" key={dimension}>
-                      <input
-                        type="checkbox"
-                        checked={selectedSecondaryDimensions.includes(dimension)}
-                        onChange={() =>
-                          setSelectedSecondaryDimensions((current) => toggleValue(current, dimension))
-                        }
-                      />
-                      <span>{dimension}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="criteria-block">
-              <label>知识点标签</label>
-              {selectedKnowledgeIds.length === 0 ? (
-                <p className="muted">先选择知识条目后，可按标签进一步聚焦出题。</p>
-              ) : availableTags.length === 0 ? (
-                <p className="muted">所选知识条目暂无标签，可先到知识库编辑标签。</p>
-              ) : (
-                <div className="choice-grid">
-                  {availableTags.map((tag) => (
-                    <label className="filter-choice" key={tag}>
-                      <input
-                        type="checkbox"
-                        checked={selectedTags.includes(tag)}
-                        onChange={() => setSelectedTags((current) => toggleValue(current, tag))}
-                      />
-                      <span>{tag}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          <label className="form-row full">
-            <span>出题要求</span>
-            <textarea
-              value={requirement}
-              onChange={(event) => setRequirement(event.target.value)}
-              placeholder="例如：生成 3 道场景化单选题，偏应用层级，聚焦隐私风险和结果核验。"
-            />
-          </label>
-          <label className="form-row">
-            <span>生成数量</span>
-            <input
-              type="number"
-              min={1}
-              max={20}
-              value={draftCount}
-              onChange={(event) => setDraftCount(Number(event.target.value))}
-            />
-          </label>
-          <div className="toolbar" style={{ marginTop: 14 }}>
-            <button className="primary" type="submit" disabled={generating || selectedKnowledgeIds.length === 0}>
-              {generating ? "生成中..." : "生成题目草稿"}
-            </button>
-          </div>
-        </form>
-      </section>
 
       <GenerationJobList jobs={generationJobs} batches={generationBatches} loading={loading} />
 
@@ -520,34 +356,50 @@ export default function DraftGeneratorPanel() {
           <span className="muted">{drafts.length} 道草稿</span>
         </div>
         <div className="draft-card-list">
-          {drafts.map((draft) => (
-            <DraftEditor
-              key={draft.id}
-              draft={draft}
-              tagsText={tagsTextById[draft.id] ?? ""}
-              knowledgePointsText={knowledgePointsTextById[draft.id] ?? ""}
-              saving={savingId === draft.id}
-              onFieldChange={updateDraftField}
-              onTagsTextChange={(value) =>
-                setTagsTextById((current) => ({
-                  ...current,
-                  [draft.id]: value
-                }))
-              }
-              onKnowledgePointsTextChange={(value) =>
-                setKnowledgePointsTextById((current) => ({
-                  ...current,
-                  [draft.id]: value
-                }))
-              }
-              onOptionChange={updateOption}
-              onOptionAdd={addOption}
-              onOptionRemove={removeOption}
-              onSave={() => void saveDraft(draft)}
-              onDelete={() => void deleteDraft(draft)}
-              onAccept={() => void acceptDraft(draft)}
-            />
-          ))}
+          {drafts.map((draft) =>
+            expandedDraftId === draft.id ? (
+              <DraftEditor
+                key={draft.id}
+                draft={draft}
+                tagsText={tagsTextById[draft.id] ?? ""}
+                knowledgePointsText={knowledgePointsTextById[draft.id] ?? ""}
+                dimensionOptions={dimensionOptions}
+                getSecondaryOptions={(dimension) =>
+                  secondaryOptionsByDimension.get(dimension) ?? [...getSecondaryDimensions(dimension)]
+                }
+                saving={savingId === draft.id}
+                onCollapse={() => setExpandedDraftId("")}
+                onFieldChange={updateDraftField}
+                onTagsTextChange={(value) =>
+                  setTagsTextById((current) => ({
+                    ...current,
+                    [draft.id]: value
+                  }))
+                }
+                onKnowledgePointsTextChange={(value) =>
+                  setKnowledgePointsTextById((current) => ({
+                    ...current,
+                    [draft.id]: value
+                  }))
+                }
+                onOptionChange={updateOption}
+                onOptionAdd={addOption}
+                onOptionRemove={removeOption}
+                onSave={() => void saveDraft(draft)}
+                onDelete={() => void deleteDraft(draft)}
+                onAccept={() => void acceptDraft(draft)}
+              />
+            ) : (
+              <DraftSummaryCard
+                key={draft.id}
+                draft={draft}
+                saving={savingId === draft.id}
+                onEdit={() => setExpandedDraftId(draft.id)}
+                onDelete={() => void deleteDraft(draft)}
+                onAccept={() => void acceptDraft(draft)}
+              />
+            )
+          )}
           {!loading && drafts.length === 0 ? <div className="empty-state">暂无出题草稿。</div> : null}
         </div>
       </section>
@@ -639,11 +491,65 @@ function GenerationJobList({ jobs, batches, loading }: GenerationJobListProps) {
   );
 }
 
+type DraftSummaryCardProps = {
+  draft: QuestionDraft;
+  saving: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onAccept: () => void;
+};
+
+function DraftSummaryCard({ draft, saving, onEdit, onDelete, onAccept }: DraftSummaryCardProps) {
+  const summaryText = [draft.scenario, draft.question].filter(Boolean).join(" ");
+  const knowledgePoints = draft.knowledgePoints?.length ? draft.knowledgePoints : draft.tags;
+
+  return (
+    <article className="draft-card draft-summary-card">
+      <div className="draft-card-header">
+        <div>
+          <strong>{draft.title || "未命名草稿"}</strong>
+          <p className="muted">{summaryText.length > 140 ? `${summaryText.slice(0, 140)}...` : summaryText}</p>
+        </div>
+        <div className="actions">
+          <button type="button" onClick={onEdit} disabled={saving}>
+            编辑
+          </button>
+          <button className="danger" type="button" onClick={onDelete} disabled={saving}>
+            删除
+          </button>
+          <button className="primary" type="button" onClick={onAccept} disabled={saving}>
+            接受
+          </button>
+        </div>
+      </div>
+      <div className="badge-row">
+        <span className="badge">{draft.questionType || "单选"}</span>
+        <span className="badge">{draft.dimension || "未标一级维度"}</span>
+        <span className="badge">{draft.secondaryDimension || "未标二级维度"}</span>
+        <span className="badge">{difficultyText(draft.difficultyEstimate)}</span>
+        <span className="badge">{statusText(draft.status)}</span>
+      </div>
+      {knowledgePoints.length > 0 ? (
+        <div className="badge-row">
+          {knowledgePoints.slice(0, 6).map((item, index) => (
+            <span className="badge" key={`${draft.id}-${item}-${index}`}>
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 type DraftEditorProps = {
   draft: QuestionDraft;
   tagsText: string;
   knowledgePointsText: string;
+  dimensionOptions: string[];
+  getSecondaryOptions: (dimension: string) => string[];
   saving: boolean;
+  onCollapse: () => void;
   onFieldChange: <K extends keyof QuestionDraftInput>(id: string, field: K, value: QuestionDraftInput[K]) => void;
   onTagsTextChange: (value: string) => void;
   onKnowledgePointsTextChange: (value: string) => void;
@@ -659,7 +565,10 @@ function DraftEditor({
   draft,
   tagsText,
   knowledgePointsText,
+  dimensionOptions,
+  getSecondaryOptions,
   saving,
+  onCollapse,
   onFieldChange,
   onTagsTextChange,
   onKnowledgePointsTextChange,
@@ -670,6 +579,14 @@ function DraftEditor({
   onDelete,
   onAccept
 }: DraftEditorProps) {
+  const secondaryDimensionOptions = useMemo(() => {
+    const options = getSecondaryOptions(draft.dimension);
+    if (draft.secondaryDimension && !options.includes(draft.secondaryDimension)) {
+      return [draft.secondaryDimension, ...options];
+    }
+    return options;
+  }, [draft.dimension, draft.secondaryDimension, getSecondaryOptions]);
+
   return (
     <article className="draft-card">
       <div className="draft-card-header">
@@ -678,6 +595,9 @@ function DraftEditor({
           <p className="muted">草稿题未分配 itemCode，接受后进入正式题库时自动分配。</p>
         </div>
         <div className="actions">
+          <button type="button" onClick={onCollapse} disabled={saving}>
+            收起
+          </button>
           <button type="button" onClick={onSave} disabled={saving}>
             {saving ? "处理中..." : "保存"}
           </button>
@@ -757,7 +677,7 @@ function DraftEditor({
             onChange={(event) => onFieldChange(draft.id, "dimension", event.target.value)}
           >
             <option value="">请选择一级维度</option>
-            {aiLiteracyDimensions.map((dimension) => (
+            {dimensionOptions.map((dimension) => (
               <option key={dimension} value={dimension}>
                 {dimension}
               </option>
@@ -772,7 +692,7 @@ function DraftEditor({
             disabled={!draft.dimension}
           >
             <option value="">{draft.dimension ? "请选择二级维度" : "先选一级维度"}</option>
-            {getSecondaryDimensions(draft.dimension).map((dimension) => (
+            {secondaryDimensionOptions.map((dimension) => (
               <option key={dimension} value={dimension}>
                 {dimension}
               </option>

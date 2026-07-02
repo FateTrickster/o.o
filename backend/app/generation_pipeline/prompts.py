@@ -33,6 +33,7 @@ def build_structured_prompt(task: TaskSpec, points: List[KnowledgePointContext])
 - 每个知识点生成数量：{count}
 - 目标难度：{task.difficulty_target}
 - 目标认知层级：{task.cognitive_level_target or "由知识点和题型决定"}
+- 目标标签/知识点：{"、".join(task.target_tags) if task.target_tags else "未限定"}
 - 额外要求：{extra_requirement}
 
 硬性规则：

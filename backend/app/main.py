@@ -226,6 +226,7 @@ async def run_question_generation_pipeline(request: QuestionPipelineRunRequest):
         stage=request.stage,
         dimensions=request.dimensions,
         secondary_dimensions=request.secondaryDimensions,
+        target_tags=request.targetTags,
         knowledge_codes=request.knowledgeCodes,
         providers=request.providers,
         question_type=request.questionType,

@@ -126,6 +126,7 @@ class QuestionPipelineRunRequest(BaseModel):
     providers: List[str] = Field(default_factory=lambda: ["mock"])
     dimensions: List[str] = Field(default_factory=list)
     secondaryDimensions: List[str] = Field(default_factory=list)
+    targetTags: List[str] = Field(default_factory=list)
     knowledgeCodes: List[str] = Field(default_factory=list)
     questionType: str = "单选"
     countPerKnowledgePoint: int = Field(default=1, ge=1, le=20)

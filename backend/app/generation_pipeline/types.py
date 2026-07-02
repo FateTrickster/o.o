@@ -10,6 +10,7 @@ class TaskSpec:
     stage: str = "初中"
     dimensions: List[str] = field(default_factory=list)
     secondary_dimensions: List[str] = field(default_factory=list)
+    target_tags: List[str] = field(default_factory=list)
     knowledge_codes: List[str] = field(default_factory=list)
     providers: List[str] = field(default_factory=lambda: ["mock"])
     question_type: str = "单选"

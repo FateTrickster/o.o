@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { aiLiteracyDimensions, getSecondaryDimensions } from "@/lib/aiLiteracyFramework";
+import { aiLiteracyDimensions } from "@/lib/aiLiteracyFramework";
 import { KnowledgePoint } from "@/types/question";
 
 type PipelineResultCandidate = {
@@ -59,6 +59,7 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
   const [stage, setStage] = useState("初中");
   const [dimensions, setDimensions] = useState<string[]>([]);
   const [secondaryDimensions, setSecondaryDimensions] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [knowledgeCodesText, setKnowledgeCodesText] = useState("");
   const [countPerKnowledgePoint, setCountPerKnowledgePoint] = useState(1);
   const [limitPerDimension, setLimitPerDimension] = useState(1);
@@ -93,18 +94,45 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
     void loadKnowledgePoints();
   }, []);
 
-  const availableSecondaryDimensions = useMemo<string[]>(
-    () => dimensions.flatMap((dimension) => [...getSecondaryDimensions(dimension)]),
-    [dimensions]
+  const stageKnowledgePoints = useMemo(
+    () => knowledgePoints.filter((point) => !stage || point.stage === stage),
+    [knowledgePoints, stage]
   );
 
-  const matchingKnowledgePoints = useMemo(() => {
+  const availableDimensions = useMemo(() => {
+    const values = Array.from(new Set(stageKnowledgePoints.map((point) => point.primaryDimension).filter(Boolean)));
+    return values.sort((a, b) => {
+      const aIndex = aiLiteracyDimensions.indexOf(a as (typeof aiLiteracyDimensions)[number]);
+      const bIndex = aiLiteracyDimensions.indexOf(b as (typeof aiLiteracyDimensions)[number]);
+      if (aIndex === -1 && bIndex === -1) {
+        return a.localeCompare(b, "zh-Hans-CN");
+      }
+      if (aIndex === -1) {
+        return 1;
+      }
+      if (bIndex === -1) {
+        return -1;
+      }
+      return aIndex - bIndex;
+    });
+  }, [stageKnowledgePoints]);
+
+  const availableSecondaryDimensions = useMemo<string[]>(() => {
+    const selectedDimensionSet = new Set(dimensions);
+    return Array.from(
+      new Set(
+        stageKnowledgePoints
+          .filter((point) => selectedDimensionSet.size === 0 || selectedDimensionSet.has(point.primaryDimension))
+          .map((point) => point.secondaryDimension)
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
+  }, [dimensions, stageKnowledgePoints]);
+
+  const candidateKnowledgePoints = useMemo(() => {
     const wantedCodes = splitCodes(knowledgeCodesText);
     const wantedCodeSet = new Set(wantedCodes);
-    return knowledgePoints.filter((point) => {
-      if (stage && point.stage !== stage) {
-        return false;
-      }
+    return stageKnowledgePoints.filter((point) => {
       if (wantedCodeSet.size > 0) {
         return wantedCodeSet.has(point.knowledgeCode);
       }
@@ -116,11 +144,42 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
       }
       return true;
     });
-  }, [dimensions, knowledgeCodesText, knowledgePoints, secondaryDimensions, stage]);
+  }, [dimensions, knowledgeCodesText, secondaryDimensions, stageKnowledgePoints]);
+
+  const availableTags = useMemo(() => {
+    return Array.from(
+      new Set(
+        candidateKnowledgePoints
+          .flatMap((point) => [point.knowledgePoint, point.tertiaryAbility, ...point.tags])
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
+  }, [candidateKnowledgePoints]);
+
+  const matchingKnowledgePoints = useMemo(() => {
+    if (selectedTags.length === 0) {
+      return candidateKnowledgePoints;
+    }
+    const selectedTagSet = new Set(selectedTags);
+    return candidateKnowledgePoints.filter((point) => {
+      const pointTags = new Set([point.stage, point.primaryDimension, point.secondaryDimension, point.tertiaryAbility, point.knowledgePoint, ...point.tags]);
+      for (const tag of selectedTagSet) {
+        if (pointTags.has(tag)) {
+          return true;
+        }
+      }
+        return false;
+    });
+  }, [candidateKnowledgePoints, selectedTags]);
 
   useEffect(() => {
     setSecondaryDimensions((current) => current.filter((item) => availableSecondaryDimensions.includes(item)));
   }, [availableSecondaryDimensions]);
+
+  useEffect(() => {
+    setSelectedTags((current) => current.filter((item) => availableTags.includes(item)));
+  }, [availableTags]);
 
   const plannedKnowledgePoints =
     splitCodes(knowledgeCodesText).length > 0
@@ -157,6 +216,7 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
           providers,
           dimensions,
           secondaryDimensions,
+          targetTags: selectedTags,
           knowledgeCodes: splitCodes(knowledgeCodesText),
           questionType: "单选",
           countPerKnowledgePoint,
@@ -288,11 +348,12 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
                 </label>
               ))}
             </div>
+            <p className="muted">mock 用于本地流程测试；xfyun/deepseek 需要本地环境变量已配置且接口可用。</p>
           </label>
           <label className="form-row full">
             <span>一级维度</span>
             <div className="choice-grid">
-              {aiLiteracyDimensions.map((dimension) => (
+              {availableDimensions.map((dimension) => (
                 <label className="filter-choice" key={dimension}>
                   <input
                     checked={dimensions.includes(dimension)}
@@ -306,8 +367,8 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
           </label>
           <label className="form-row full">
             <span>二级维度</span>
-            {dimensions.length === 0 ? (
-              <p className="muted">未选择一级维度时，默认每个一级维度取若干知识点。</p>
+            {availableSecondaryDimensions.length === 0 ? (
+              <p className="muted">当前筛选条件下暂无二级维度。</p>
             ) : (
               <div className="choice-grid secondary-choice-grid">
                 {availableSecondaryDimensions.map((dimension) => (
@@ -318,6 +379,25 @@ export default function PipelineGeneratorPanel({ onCompleted }: PipelineGenerato
                       onChange={() => setSecondaryDimensions((current) => toggleValue(current, dimension))}
                     />
                     <span>{dimension}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </label>
+          <label className="form-row full">
+            <span>知识点/标签</span>
+            {availableTags.length === 0 ? (
+              <p className="muted">当前筛选条件下暂无可选知识点或标签。</p>
+            ) : (
+              <div className="choice-grid secondary-choice-grid">
+                {availableTags.slice(0, 80).map((tag) => (
+                  <label className="filter-choice" key={tag}>
+                    <input
+                      checked={selectedTags.includes(tag)}
+                      type="checkbox"
+                      onChange={() => setSelectedTags((current) => toggleValue(current, tag))}
+                    />
+                    <span>{tag}</span>
                   </label>
                 ))}
               </div>
