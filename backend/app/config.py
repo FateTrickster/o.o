@@ -85,3 +85,35 @@ def get_kimi_model() -> str:
 
 def get_kimi_base_url() -> str:
     return (get_setting("KIMI_BASE_URL", "https://api.moonshot.cn/v1") or "https://api.moonshot.cn/v1").rstrip("/")
+
+
+DEFAULT_RAG_DB_PATH = BACKEND_DIR / "data" / "rag" / "zhishitupu.db"
+
+
+def get_dashscope_api_key() -> str:
+    value = get_setting("DASHSCOPE_API_KEY", "")
+    if not value:
+        raise RuntimeError(
+            "DASHSCOPE_API_KEY is not configured; set it in the environment or in .env.local"
+        )
+    return value
+
+
+def get_dashscope_base_url() -> str:
+    return (
+        get_setting("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+        or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    ).rstrip("/")
+
+
+def get_dashscope_embedding_model() -> str:
+    return get_setting("DASHSCOPE_EMBEDDING_MODEL", "text-embedding-v4") or "text-embedding-v4"
+
+
+def get_dashscope_embedding_dimensions() -> int:
+    return int(get_setting("DASHSCOPE_EMBEDDING_DIMENSIONS", "1024") or "1024")
+
+
+def get_rag_database_path() -> Path:
+    configured = get_setting("RAG_DATABASE_PATH")
+    return Path(configured) if configured else DEFAULT_RAG_DB_PATH
