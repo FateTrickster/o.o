@@ -88,6 +88,7 @@ def write_report(report: PipelineReport) -> PipelineReport:
         "errors": report.errors,
         "selectedKnowledgePoints": [asdict(point) for point in report.selected_points],
         "summary": _summary(report.candidates),
+        "ragUsage": report.rag_usage,
         "candidates": rows,
     }
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

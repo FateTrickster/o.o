@@ -63,6 +63,8 @@ def load_task_spec(path: Optional[str] = None, overrides: Optional[Dict[str, Any
         ai_review_min_score=int(data.get("aiReviewMinScore") or data.get("ai_review_min_score") or 75),
         write_drafts=_bool_value(data.get("writeDrafts") or data.get("write_drafts"), False),
         output_dir=str(data.get("outputDir") or data.get("output_dir") or "outputs"),
+        use_rag=_bool_value(data.get("useRag") or data.get("use_rag"), False),
+        rag_top_k=int(data.get("ragTopK") or data.get("rag_top_k") or 3),
     )
 
 
@@ -89,4 +91,6 @@ def task_to_dict(task: TaskSpec) -> Dict[str, Any]:
         "aiReviewMinScore": task.ai_review_min_score,
         "writeDrafts": task.write_drafts,
         "outputDir": task.output_dir,
+        "useRag": task.use_rag,
+        "ragTopK": task.rag_top_k,
     }

@@ -142,6 +142,8 @@ class QuestionPipelineRunRequest(BaseModel):
     aiReviewMinScore: int = Field(default=75, ge=0, le=100)
     writeDrafts: bool = True
     outputDir: str = "outputs/question-pipeline"
+    useRag: bool = False
+    ragTopK: int = Field(default=3, ge=1, le=5)
 
 
 class QuestionPipelineRunResult(BaseModel):
@@ -152,6 +154,7 @@ class QuestionPipelineRunResult(BaseModel):
     reportJson: str = ""
     reportCsv: str = ""
     candidates: List[Dict[str, Any]] = Field(default_factory=list)
+    ragUsage: Dict[str, Any] = Field(default_factory=lambda: {"enabled": False})
 
 
 class QuestionType(BaseModel):

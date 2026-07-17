@@ -243,6 +243,8 @@ async def run_question_generation_pipeline(request: QuestionPipelineRunRequest):
         ai_review_min_score=request.aiReviewMinScore,
         write_drafts=request.writeDrafts,
         output_dir=request.outputDir,
+        use_rag=request.useRag,
+        rag_top_k=request.ragTopK,
     )
     try:
         report = await run_question_pipeline(task)
@@ -257,6 +259,7 @@ async def run_question_generation_pipeline(request: QuestionPipelineRunRequest):
         reportJson=report.report_json,
         reportCsv=report.report_csv,
         candidates=[candidate_to_row(index, candidate) for index, candidate in enumerate(report.candidates, start=1)],
+        ragUsage=report.rag_usage,
     )
 
 

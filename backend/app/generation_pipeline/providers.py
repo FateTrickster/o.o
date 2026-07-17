@@ -172,19 +172,25 @@ def mock_generate(points: List[KnowledgePointContext], task: TaskSpec, provider:
     return questions
 
 
-async def api_generate(provider: str, points: List[KnowledgePointContext], task: TaskSpec) -> List[GeneratedQuestion]:
+async def api_generate(
+    provider: str,
+    points: List[KnowledgePointContext],
+    task: TaskSpec,
+    rag_context_by_knowledge_code: Dict[str, List[Dict[str, Any]]] | None = None,
+) -> List[GeneratedQuestion]:
+    messages = build_structured_prompt(task, points, rag_context_by_knowledge_code)
     if provider == "xfyun":
         api_key = get_xfyun_api_key()
         base_url = get_xfyun_base_url()
         model = get_xfyun_model()
-        payload = {"model": model, "messages": build_structured_prompt(task, points), "temperature": 0.35}
+        payload = {"model": model, "messages": messages, "temperature": 0.35}
     elif provider == "deepseek":
         api_key = get_deepseek_api_key()
         base_url = get_deepseek_base_url()
         model = get_deepseek_model()
         payload = {
             "model": model,
-            "messages": build_structured_prompt(task, points),
+            "messages": messages,
             "temperature": 0.35,
             "response_format": {"type": "json_object"},
         }
@@ -194,7 +200,7 @@ async def api_generate(provider: str, points: List[KnowledgePointContext], task:
         model = get_kimi_model()
         payload = {
             "model": model,
-            "messages": build_structured_prompt(task, points),
+            "messages": messages,
             "temperature": 0.6,
             "response_format": {"type": "json_object"},
             "thinking": {"type": "disabled"},
@@ -218,7 +224,12 @@ async def api_generate(provider: str, points: List[KnowledgePointContext], task:
     return [normalize_question(provider, raw, points, task) for raw in raw_questions]
 
 
-async def generate_for_provider(provider: str, points: List[KnowledgePointContext], task: TaskSpec) -> List[GeneratedQuestion]:
+async def generate_for_provider(
+    provider: str,
+    points: List[KnowledgePointContext],
+    task: TaskSpec,
+    rag_context_by_knowledge_code: Dict[str, List[Dict[str, Any]]] | None = None,
+) -> List[GeneratedQuestion]:
     if provider == "mock":
         return mock_generate(points, task)
-    return await api_generate(provider, points, task)
+    return await api_generate(provider, points, task, rag_context_by_knowledge_code)

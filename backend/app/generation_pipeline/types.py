@@ -27,6 +27,8 @@ class TaskSpec:
     ai_review_min_score: int = 75
     write_drafts: bool = False
     output_dir: str = "outputs"
+    use_rag: bool = False
+    rag_top_k: int = 3
 
 
 @dataclass
@@ -107,3 +109,4 @@ class PipelineReport:
     errors: List[str] = field(default_factory=list)
     report_json: str = ""
     report_csv: str = ""
+    rag_usage: Dict[str, Any] = field(default_factory=lambda: {"enabled": False})

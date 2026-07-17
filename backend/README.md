@@ -253,6 +253,17 @@ PUT    /questions/{question_id}
 DELETE /questions/{question_id}
 ```
 
+## Textbook RAG (Optional)
+
+The question pipeline can retrieve textbook chunks as generation evidence.
+
+- RAG is disabled by default (`useRag=false` in `POST /question-pipeline/run`, `use_rag=false` in task config JSON).
+- Enable it by setting `useRag=true` and optionally `ragTopK` (1-5, default 3).
+- Requires Python 3.12 and the `duckdb` / `numpy` / `openai` dependencies from `requirements.txt`.
+- Requires `DASHSCOPE_API_KEY` in the environment or `.env.local` (see `.env.example`).
+- The vector database defaults to `backend/data/rag/zhishitupu.db` (override with `RAG_DATABASE_PATH`). This file is not tracked by regular Git; copy it into place manually.
+- When RAG is enabled and the database or API key is missing, the pipeline fails with an explicit error instead of silently generating without textbook evidence.
+
 ## Notes
 
 This MVP intentionally uses the Python standard `sqlite3` module to keep the first migration small. A later phase can replace repositories with SQLAlchemy and Alembic migrations.
