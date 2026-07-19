@@ -242,8 +242,16 @@ class TestErrorPropagation(unittest.TestCase):
     def test_missing_api_key_fails_clearly(self):
         from backend.app.rag.retriever import search_chunks
 
-        env = {k: v for k, v in os.environ.items() if k != "DASHSCOPE_API_KEY"}
-        with mock.patch.dict(os.environ, env, clear=True):
+        # Patch the actual runtime reference in embedding.py (imported via
+        # "from backend.app.config import get_dashscope_api_key") rather than
+        # manipulating os.environ, which would still fall back to .env.local.
+        with mock.patch(
+            "backend.app.rag.embedding.get_dashscope_api_key",
+            side_effect=RuntimeError(
+                "DASHSCOPE_API_KEY is not configured; "
+                "set it in the environment or in .env.local"
+            ),
+        ):
             with self.assertRaises(RuntimeError) as ctx:
                 search_chunks("什么是人工智能？", top_k=3)
         message = str(ctx.exception)
