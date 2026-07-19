@@ -262,7 +262,7 @@ The question pipeline can retrieve textbook chunks as generation evidence.
 - Requires Python 3.12 and the `duckdb` / `numpy` / `openai` dependencies from `requirements.txt`.
 - Requires `DASHSCOPE_API_KEY` in the environment or `.env.local` (see `.env.example`). Never commit `.env.local`.
 - Embedding model: `text-embedding-v4` (DashScope OpenAI-compatible endpoint, 1024-dim vectors).
-- The vector database is at `backend/data/rag/zhishitupu.db` (~51 MB, 2090 chunks × 1024-dim). It is tracked via Git LFS. Override with `RAG_DATABASE_PATH` if needed.
+- The vector database is at `backend/data/rag/zhishitupu.db` (~51 MB, 2090 chunks × 1024-dim). It is distributed via GitHub Release — see [`backend/data/rag/README.md`](data/rag/README.md) for download instructions. Override with `RAG_DATABASE_PATH` if needed.
 - When RAG is enabled and the database or API key is missing, the pipeline fails with an explicit error instead of silently generating without textbook evidence.
 
 ### Run Tests
