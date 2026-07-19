@@ -260,9 +260,16 @@ The question pipeline can retrieve textbook chunks as generation evidence.
 - RAG is disabled by default (`useRag=false` in `POST /question-pipeline/run`, `use_rag=false` in task config JSON).
 - Enable it by setting `useRag=true` and optionally `ragTopK` (1-5, default 3).
 - Requires Python 3.12 and the `duckdb` / `numpy` / `openai` dependencies from `requirements.txt`.
-- Requires `DASHSCOPE_API_KEY` in the environment or `.env.local` (see `.env.example`).
-- The vector database defaults to `backend/data/rag/zhishitupu.db` (override with `RAG_DATABASE_PATH`). This file is not tracked by regular Git; copy it into place manually.
+- Requires `DASHSCOPE_API_KEY` in the environment or `.env.local` (see `.env.example`). Never commit `.env.local`.
+- Embedding model: `text-embedding-v4` (DashScope OpenAI-compatible endpoint, 1024-dim vectors).
+- The vector database is at `backend/data/rag/zhishitupu.db` (~51 MB, 2090 chunks × 1024-dim). It is tracked via Git LFS. Override with `RAG_DATABASE_PATH` if needed.
 - When RAG is enabled and the database or API key is missing, the pipeline fails with an explicit error instead of silently generating without textbook evidence.
+
+### Run Tests
+
+```bash
+py -3.12 -m unittest discover -s backend/tests -p "test_*.py" -v
+```
 
 ## Notes
 

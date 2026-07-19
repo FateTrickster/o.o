@@ -1,14 +1,42 @@
+# Local secrets — .env.example is the only tracked env file
 .env
 .env.local
 .env.*.local
-node_modules
-.next
-*.log
+
+# Python
 __pycache__/
-*.pyc
-backend/data/
-knowledge/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Runtime data
+*.log
+*.tmp
 outputs/
+
+# Local databases (runtime-generated)
+backend/data/ai_literacy.db
+backend/data/rag/zhishitupu.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Frontend
+node_modules/
+.next/
+dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Data imports & comparison artifacts
+knowledge/
 data/*comparison*.json
 data/imported_workbook_questions.json
 data/knowledge_point_comparison_plan_*.json
